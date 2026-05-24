@@ -826,10 +826,6 @@ function buildLogboek() {
       <button class="log-sub-tab ${S.logSubTab==='training'?'active':''}" data-logtab="training">📅 Training Log</button>
       <button class="log-sub-tab ${S.logSubTab==='sparring'?'active':''}" data-logtab="sparring">🥊 Sparring Notes</button>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-      <button id="btn-export" style="background:transparent;border:1px solid var(--blue);color:var(--blue);padding:8px 14px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:6px;cursor:pointer">⬇ Export backup</button>
-      <label id="btn-import-label" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 14px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:6px;cursor:pointer">⬆ Import backup<input type="file" id="btn-import" accept=".json" style="display:none"></label>
-    </div>
     ${S.logSubTab === 'training' ? buildTrainingLog() : buildSparringLog()}`;
 }
 
@@ -1105,6 +1101,7 @@ document.addEventListener('click', function(e) {
     URL.revokeObjectURL(url);
     return;
   }
+  if (el.id === 'btn-open-log-form') { S.modal = 'log'; render(); return; }
   if (el.id === 'btn-open-sparring-form') { S.modal = 'sparring'; render(); return; }
   if (el.dataset.delLog) {
     if (confirm('Delete this session?')) { S.logboek=S.logboek.filter(l=>l.id!==parseInt(el.dataset.delLog)); saveLog(); render(); }
@@ -1116,7 +1113,7 @@ document.addEventListener('click', function(e) {
   }
 
   // ── Modal ──
-  if (el.id === 'modal-overlay') { S.modal=null; S.editId=null; render(); return; }
+  if (el.id === 'modal-overlay' && el === e.target) { S.modal=null; S.editId=null; render(); return; }
   if (el.id === 'btn-close-modal') { S.modal=null; S.editId=null; render(); return; }
 
   if (el.id === 'btn-save-tech') {
@@ -1135,6 +1132,7 @@ document.addEventListener('click', function(e) {
   }
 
   if (el.id === 'btn-save-log') {
+    e.stopPropagation();
     const datum = document.getElementById('f-log-datum').value;
     const partner = document.getElementById('f-log-partner').value.trim();
     const notities = document.getElementById('f-log-notities').value.trim();
@@ -1144,6 +1142,7 @@ document.addEventListener('click', function(e) {
   }
 
   if (el.id === 'btn-save-sparring') {
+    e.stopPropagation();
     const datum = document.getElementById('f-sp-datum').value;
     const partner = document.getElementById('f-sp-partner').value.trim();
     const werkte = document.getElementById('f-sp-werkte').value.trim();
