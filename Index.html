@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jiu-Jitsu Techniekboek</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f5f0;
+  --card: #ffffff;
+  --border: #e2ddd6;
+  --text: #1c1917;
+  --muted: #78716c;
+  --faint: #f0ede8;
+  --accent: #c0392b;
+  --accent-light: #fef2f2;
+  --blue: #1e3a5f;
+  --blue-light: #eff6ff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body { font-family: 'Crimson Pro', Georgia, serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+.header { background: var(--blue); padding: 20px 20px 0; }
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.brand-sub { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 4px; color: #93c5fd; text-transform: uppercase; margin-bottom: 4px; }
+.brand-title { font-size: 28px; font-weight: 600; color: #fff; }
+.brand-count { font-family: 'DM Mono', monospace; font-size: 12px; color: #93c5fd; margin-top: 2px; }
+.btn-primary { background: var(--accent); color: #fff; border: none; padding: 10px 16px; font-size: 14px; font-family: 'DM Mono', monospace; cursor: pointer; border-radius: 4px; white-space: nowrap; }
+.btn-primary:active { opacity: 0.8; }
+
+/* SEARCH */
+.search-wrap { padding: 0 0 16px; position: relative; }
+.search-input { width: 100%; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 11px 40px 11px 14px; font-size: 15px; font-family: 'Crimson Pro', serif; border-radius: 6px; outline: none; }
+.search-input::placeholder { color: rgba(255,255,255,0.5); }
+.search-clear { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; display: none; }
+
+/* TABS */
+.tabs { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.tab { background: transparent; border: none; border-bottom: 2px solid transparent; color: rgba(255,255,255,0.5); padding: 12px 16px; font-size: 14px; font-family: 'Crimson Pro', serif; cursor: pointer; white-space: nowrap; margin-bottom: -1px; transition: color 0.15s; }
+.tab.active { color: #fff; border-bottom-color: #fff; }
+
+/* MAIN */
+.main { padding: 20px; }
+.section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+
+/* CARDS GRID */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+/* POSITION CARD */
+.pos-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; border-left: 4px solid; padding: 18px; cursor: pointer; transition: box-shadow 0.15s; -webkit-tap-highlight-color: transparent; }
+.pos-card:active { box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+.pos-japans { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.pos-naam { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+.pos-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--faint); margin-top: 8px; }
+.pos-count-num { font-size: 20px; font-weight: 600; }
+.pos-bekijk { font-family: 'DM Mono', monospace; font-size: 11px; }
+
+/* TECHNIQUE CARD */
+.tech-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; border-left: 4px solid; padding: 18px; }
+.tech-cat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+.tech-naam { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.tech-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.tech-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 3px 8px; border-radius: 20px; border: 1px solid; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tech-notities { font-size: 14px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--faint); padding-top: 10px; margin-top: 8px; }
+.tech-actions { display: flex; gap: 8px; margin-top: 14px; align-items: center; }
+.btn-sm { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; font-size: 12px; font-family: 'DM Mono', monospace; cursor: pointer; border-radius: 4px; }
+.btn-del { border-color: #fecaca; color: var(--accent); }
+.btn-fav { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0; line-height: 1; }
+
+/* UITLEG TOGGLE */
+.uitleg-toggle { width: 100%; background: transparent; padding: 9px 0; font-size: 12px; font-family: 'DM Mono', monospace; cursor: pointer; border-radius: 4px; margin-top: 12px; letter-spacing: 1px; text-transform: uppercase; transition: all 0.15s; }
+.uitleg-panel { border-radius: 0 0 6px 6px; border-top: none; margin-top: 0; }
+.uitleg-tabs { display: flex; background: var(--faint); border-radius: 6px 6px 0 0; overflow: hidden; }
+.uitleg-tab { flex: 1; background: transparent; border: none; border-bottom: 2px solid transparent; padding: 10px 4px; font-size: 12px; font-family: 'DM Mono', monospace; cursor: pointer; color: var(--muted); text-align: center; -webkit-tap-highlight-color: transparent; }
+.uitleg-tab.active { color: var(--text); border-bottom-color: currentColor; }
+.uitleg-body { background: var(--faint); border-radius: 0 0 6px 6px; padding: 16px; }
+
+/* STAPPEN */
+.stap { display: flex; gap: 12px; margin-bottom: 18px; }
+.stap-nr { min-width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+.stap-titel { font-size: 15px; font-weight: 600; margin-bottom: 4px; font-style: italic; }
+.stap-uitleg { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 6px; }
+.stap-lichaam { background: var(--card); border-left: 2px solid; padding: 6px 10px; font-size: 12px; color: var(--text); border-radius: 0 4px 4px 0; margin-bottom: 6px; }
+.stap-aandacht { font-size: 12px; color: var(--muted); font-style: italic; display: flex; gap: 5px; }
+.finishing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.finish-box { padding: 10px 12px; border-radius: 6px; }
+.finish-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+.finish-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+/* VERDEDIGING */
+.verd-item { display: flex; gap: 12px; margin-bottom: 16px; }
+.verd-icon-wrap { min-width: 28px; height: 28px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.verd-titel { font-size: 15px; font-weight: 600; font-style: italic; margin-bottom: 3px; }
+.verd-uitleg { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* VIDEO */
+.video-btn-wrap { text-align: center; padding: 12px 0; }
+.video-btn { display: inline-flex; align-items: center; gap: 10px; background: #ff0000; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.play-icon { width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 13px solid white; }
+
+/* DETAIL VIEW */
+.detail-header { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+.btn-back { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; font-size: 13px; font-family: 'DM Mono', monospace; cursor: pointer; border-radius: 4px; }
+.detail-pos-naam { font-size: 22px; font-weight: 600; }
+.detail-pos-japans { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+.detail-body { padding: 20px; max-width: 900px; }
+.detail-sub-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+.detail-sub-tab { background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--muted); padding: 10px 18px; font-size: 15px; font-family: 'Crimson Pro', serif; cursor: pointer; margin-bottom: -2px; -webkit-tap-highlight-color: transparent; }
+.detail-sub-tab.active { color: var(--text); border-bottom-color: var(--text); }
+.btn-add-sub { width: 100%; margin-top: 20px; background: transparent; padding: 12px; font-size: 13px; font-family: 'DM Mono', monospace; cursor: pointer; border-radius: 6px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ESCAPE */
+.escape-situatie { background: var(--card); border-radius: 8px; border-left: 4px solid; padding: 14px 18px; margin-bottom: 20px; font-size: 14px; color: var(--muted); }
+.escape-stap { display: flex; gap: 12px; margin-bottom: 18px; }
+.escape-counter { border-radius: 8px; padding: 14px 18px; margin-top: 8px; }
+.escape-counter-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+
+/* WORPEN */
+.worp-cat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+.worp-cat-title { font-size: 20px; font-weight: 600; }
+.worp-cat-desc { font-size: 13px; color: var(--muted); margin-top: 1px; }
+.worp-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; border-left: 4px solid; padding: 16px; }
+.worp-naam { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
+.worp-japans { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-bottom: 10px; }
+.worp-uitleg { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+.kuzushi-box { border-left: 3px solid; padding: 6px 10px; border-radius: 0 4px 4px 0; margin-bottom: 12px; }
+.kuzushi-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+.kuzushi-text { font-size: 13px; }
+
+/* LOGBOEK */
+.log-sub-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+.log-sub-tab { background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--muted); padding: 10px 18px; font-size: 15px; font-family: 'Crimson Pro', serif; cursor: pointer; margin-bottom: -2px; -webkit-tap-highlight-color: transparent; }
+.log-sub-tab.active { color: var(--text); border-bottom-color: var(--text); }
+.log-form { background: var(--card); border: 1px solid var(--border); border-radius: 10px; border-left: 4px solid var(--blue); padding: 22px; margin-bottom: 22px; }
+.sparring-form { border-left-color: var(--accent); }
+.form-section-title { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--blue); margin-bottom: 18px; }
+.sparring-form .form-section-title { color: var(--accent); }
+.form-label { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.form-input { display: block; width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; font-size: 15px; font-family: 'Crimson Pro', serif; margin-bottom: 14px; border-radius: 6px; outline: none; -webkit-appearance: none; }
+.form-input:focus { border-color: var(--blue); }
+.techniek-list { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; margin-bottom: 14px; max-height: 300px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.techniek-cat-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 8px 4px 5px; border-bottom: 1px solid var(--border); margin-bottom: 3px; font-weight: 500; }
+.techniek-check-row { display: flex; align-items: center; gap: 10px; padding: 6px 4px; border-bottom: 1px solid var(--faint); cursor: pointer; }
+.techniek-check-row:last-child { border-bottom: none; }
+.techniek-check-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+.techniek-check-label { font-size: 14px; cursor: pointer; }
+.btn-save { width: 100%; background: var(--blue); color: #fff; border: none; padding: 12px; font-size: 15px; font-family: 'Crimson Pro', serif; cursor: pointer; border-radius: 6px; margin-top: 4px; }
+.btn-save-sparring { background: var(--accent); }
+.log-entry { background: var(--card); border: 1px solid var(--border); border-radius: 10px; border-left: 4px solid var(--blue); padding: 16px 18px; margin-bottom: 12px; }
+.sparring-entry { border-left-color: var(--accent); }
+.log-entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.log-datum { font-size: 17px; font-weight: 600; }
+.log-partner { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.log-count-badge { font-family: 'DM Mono', monospace; font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 20px; }
+.sparring-entry .log-count-badge { background: var(--accent-light); color: var(--accent); }
+.btn-del-entry { background: none; border: none; color: #d1d5db; font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1; -webkit-tap-highlight-color: transparent; }
+.tech-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tech-chip { font-family: 'DM Mono', monospace; font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 8px; border-radius: 20px; border: 1px solid #bfdbfe; }
+.log-notities { font-size: 14px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--faint); padding-top: 10px; }
+.sparring-section { margin-bottom: 10px; }
+.sparring-section-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.sparring-section-text { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.takeaway-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 10px 14px; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+.modal { background: var(--card); border-radius: 12px; padding: 26px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+.modal-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+.btn-cancel { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 11px 20px; font-size: 14px; font-family: 'Crimson Pro', serif; cursor: pointer; border-radius: 6px; }
+
+/* FILTER BAR */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+.search-bar input { flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; font-size: 15px; font-family: 'Crimson Pro', serif; border-radius: 6px; outline: none; }
+.btn-fav-filter { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 9px 14px; font-size: 14px; cursor: pointer; border-radius: 6px; white-space: nowrap; }
+.btn-fav-filter.on { background: #fef2f2; border-color: var(--accent); color: var(--accent); }
+.cat-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; font-size: 13px; font-family: 'DM Mono', monospace; cursor: pointer; border-radius: 20px; white-space: nowrap; }
+.cat-btn.on { color: #fff; border-color: transparent; }
+
+/* EMPTY STATE */
+.empty { text-align: center; color: var(--muted); padding: 40px 20px; border: 1px dashed var(--border); border-radius: 10px; font-size: 15px; }
+
+/* SEARCH RESULTS */
+.search-results-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.result-group-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin: 20px 0 12px; }
+mark { background: #fef08a; border-radius: 2px; padding: 0 2px; font-style: normal; }
+
+@media (max-width: 600px) {
+  .finishing-grid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+  .modal { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+
+const CATS = [
+  { id:'verwurging', label:'Choke', icon:'🔒', color:'#8e44ad' },
+  { id:'joint',      label:'Joint Lock', icon:'💪', color:'#2980b9' },
+  { id:'worp',       label:'Throw', icon:'🌀', color:'#e67e22' },
+  { id:'verdediging',label:'Defense', icon:'🛡️', color:'#27ae60' },
+  { id:'overig',     label:'Other', icon:'📌', color:'#7f8c8d' },
+];
+
+const POSITIES = [
+  { id:'mount', naam:'Mount', japans:'Tate-shiho-gatame', kleur:'#c0392b',
+    tips:['Hips low','Weight on chest','Hands free'],
+    escape:{ situatie:'You are on your back, opponent sits on your chest.', videoId:'SYel-mVSMAI',
+      stappen:[
+        { titel:'Elbows in', uitleg:'Pull both elbows tight to your body. Never let arms extend — that invites Americana or Armbar.' },
+        { titel:'Bridge (Upa)', uitleg:'Plant one foot flat, grab his arm on one side, explosively bridge your hips and roll that direction. He tips over, you end up on top.' },
+        { titel:'Elbow-knee escape', uitleg:'If bridge fails: push your elbow toward his knee on the same side. Create space, slide your hip out, bring your knee inside. Now you\'re in half guard or guard.' },
+      ], counter:'From guard immediately attack — Kimura, Triangle or Armbar when he loses posture.'
+    }
+  },
+  { id:'guard', naam:'Guard', japans:'Do-osae', kleur:'#2980b9',
+    tips:['Control his posture','Legs active','Attack constantly'],
+    escape:{ situatie:'You are kneeling between his legs — he controls from below.', videoId:'xYW7CCmA3ow',
+      stappen:[
+        { titel:'Build posture', uitleg:'Sit up straight, head up. Straight back makes it hard for him to pull you down for chokes or triangles.' },
+        { titel:'Hands on hips', uitleg:'Place both hands on his hips. This gives you control and stops him from lifting his hips for triangles or omoplatas.' },
+        { titel:'Open the guard', uitleg:'One hand on his chest, one on his knee. Stand on one foot, press his knee down and step back. His guard opens.' },
+      ], counter:'Once guard is open, pass quickly to side control or half guard — open guard still has attacks.'
+    }
+  },
+  { id:'side-control', naam:'Side Control', japans:'Yoko-shiho-gatame', kleur:'#8e44ad',
+    tips:['Head low','Hip to hip','Control near arm'],
+    escape:{ situatie:'You are on your back, opponent lies across your chest at 90 degrees.', videoId:'cuXq-k__9lQ',
+      stappen:[
+        { titel:'Protect near arm', uitleg:'Pull your closest arm immediately to your body. This arm is the first target for Americana or Kimura.' },
+        { titel:'Bridge and turn', uitleg:'Plant your feet, bridge explosively and turn toward him. Bring your knees between you. Goal is to get on your side and re-guard.' },
+        { titel:'Get underhook', uitleg:'Slide your bottom arm under his body for an underhook on his back. Whoever has underhook controls the position.' },
+      ], counter:'From underhook you can roll him to turtle or half guard — both offer sweep and submission opportunities.'
+    }
+  },
+  { id:'back-mount', naam:'Back Mount', japans:'Ushiro-kesa-gatame', kleur:'#e67e22',
+    tips:['Hooks tight','Chin on shoulder','Control arm for choke'],
+    escape:{ situatie:'Opponent sits behind you with both hooks in your hips — most dangerous position.', videoId:'dus6oFWKKBg',
+      stappen:[
+        { titel:'Chin to chest', uitleg:'Immediately press chin down. This protects your neck from the rear naked choke. One hand grabs his attacking arm.' },
+        { titel:'Shoulder to mat', uitleg:'Go to your side by dropping one shoulder to the ground. Choose the side of his lower hook — makes one hook ineffective.' },
+        { titel:'Work hook out', uitleg:'Grab his lower hook with your hand and pull his foot over your leg. Once one hook is out, turn to face him into his guard.' },
+      ], counter:'Once in his guard you have escaped. Build posture immediately and open his guard — he just lost the worst position.'
+    }
+  },
+  { id:'half-guard', naam:'Half Guard', japans:'Han-do-osae', kleur:'#27ae60',
+    tips:['Get underhook','Turn to side','Sweep threatens submissions'],
+    escape:{ situatie:'You are on your back with one of his legs trapped — he lies on top of you.', videoId:'nRFFmWCcgkE',
+      stappen:[
+        { titel:'Turn to side', uitleg:'Immediately turn to your side — lying flat on your back in half guard is dangerous. Side position gives room to underhook and attack.' },
+        { titel:'Get underhook', uitleg:'Slide your bottom arm under his arm for an underhook on his back. Whoever has underhook controls half guard.' },
+        { titel:'Close knees and sweep', uitleg:'With underhook and on your side: grab his leg with both hands and sweep him over you. Or use underhook to stand to single leg.' },
+      ], counter:'A successful sweep puts you in side control or mount. From single leg you can finish a takedown.'
+    }
+  },
+  { id:'turtle', naam:'Turtle', japans:'Kame', kleur:'#16a085',
+    tips:['Head tucked in','Control hips','Pressure on back'],
+    escape:{ situatie:'You are on hands and knees — opponent is on top or beside you.', videoId:'qshG7pBG1Ag',
+      stappen:[
+        { titel:'Protect head', uitleg:'Keep your head low and tucked. A raised head gives him room for guillotine or collar grip. Chin to chest.' },
+        { titel:'Roll to guard', uitleg:'Wait for him to shift weight. Then roll quickly to your back and bring legs up for closed guard. Safest escape.' },
+        { titel:'Stand to single leg', uitleg:'If he is at your side: plant outside foot, explosively stand and grab his leg for single leg takedown. Speed is crucial.' },
+      ], counter:'From guard attack immediately with triangle, armbar or kimura when he loses posture.'
+    }
+  },
+  { id:'north-south', naam:'North South', japans:'Kami-shiho-gatame', kleur:'#c0392b',
+    tips:['Weight on chest','Hips low','Control both arms'],
+    escape:{ situatie:'You are on your back, opponent lies reversed across your chest toward your stomach.', videoId:'fY2GTuMOsnI',
+      stappen:[
+        { titel:'Turn hips', uitleg:'Explosively turn hips to one side and bring your knee inside between your bodies. Creates space to move.' },
+        { titel:'Arm over his back', uitleg:'Close one arm over his back and grab his hip or pants. Stops him shifting weight and gives you a lever.' },
+        { titel:'Pendulum legs', uitleg:'Swing your legs like a pendulum to one side while pulling him the other. This tips him sideways so you can escape to guard.' },
+      ], counter:'From guard attack immediately. If he brings his head down, triangle or guillotine opportunities open.'
+    }
+  },
+  { id:'kesa-gatame', naam:'Kesa Gatame', japans:'袈裟固め', kleur:'#8e44ad',
+    tips:['Keep his arm tight','Weight on chest','Legs wide for stability'],
+    escape:{ situatie:'You are on your back, opponent sits beside you with your head under his arm.', videoId:'cevZODz199o',
+      stappen:[
+        { titel:'Protect free arm', uitleg:'Your free arm (the one he is not holding) is your biggest danger. Keep it bent and close to your body.' },
+        { titel:'Turn toward him', uitleg:'Turn to your side toward him. Lying flat on your back in kesa gatame is dangerous. Side position gives you room.' },
+        { titel:'Leg over his hip', uitleg:'Bring your top leg over his hip and use it as a lever to press him onto his back. Combine with a body roll to flip him.' },
+      ], counter:'If you flip him, you land in mount or side control — attack immediately with Americana or Cross Collar Choke.'
+    }
+  },
+  { id:'ushiro-kesa', naam:'Ushiro Kesa Gatame', japans:'後ろ袈裟固め', kleur:'#e67e22',
+    tips:['Legs squeeze arm tight','Weight back','Control hips'],
+    escape:{ situatie:'You are on your back, opponent sits beside you facing away — your arm is trapped between his legs.', videoId:'TBeQ9hUGp20',
+      stappen:[
+        { titel:'Free the arm', uitleg:'Turn your trapped arm so the elbow points down. This gives your arm more room to move. Pull it toward your body.' },
+        { titel:'Free arm around waist', uitleg:'Close your free arm around his waist or grab his leg. Gives you control and stops him reinforcing the position.' },
+        { titel:'Roll toward his back', uitleg:'Use his weight by turning your hips and rolling him over you. With his weight leaning back, you have leverage to flip him.' },
+      ], counter:'When he rolls you land in side control or mount. His trapped arm is vulnerable to Kimura or Americana once you are on top.'
+    }
+  },
+];
+
+const UITLEG = {
+  'Americana': { stappen:[
+    {nr:1,titel:'Isolate the arm',uitleg:'From mount push his wrist to the mat beside his head. Use bodyweight to keep it there.',lichaam:'Sit upright in mount, hips low.',aandacht:'Elbow LOWER than wrist — this is the key angle.'},
+    {nr:2,titel:'Figure-four grip',uitleg:'Grab his wrist with one hand. Thread other arm under his elbow and grab your own wrist.',lichaam:'Lean slightly toward the attacked arm.',aandacht:'Keep elbows close to the ground.'},
+    {nr:3,titel:'Rotate the shoulder',uitleg:'Lift elbow while keeping wrist pinned. Forces shoulder rotation.',lichaam:'Lean torso back for leverage.',aandacht:'Slow and controlled — shoulder taps quickly.'},
+    {nr:4,titel:'Finishing',uitleg:'Increase arc until tap.',lichaam:'Stay low in mount.',aandacht:'Stop immediately on tap.'},
+  ], finishing:'Lift elbow, pin wrist. Increase arc until tap.', veelgemaakte_fout:'Elbow higher than wrist — no rotation angle possible.', verdediging:[
+    {titel:'Elbow to mat',uitleg:'Actively push elbow down. Elbow lower than wrist = no Americana angle.'},
+    {titel:'Hand on his leg',uitleg:'Grab his leg with free hand. Blocks the rotation.'},
+  ]},
+  'Armbar from Mount': { stappen:[
+    {nr:1,titel:'Control the arm',uitleg:'From mount grab his arm with both hands, pull tight to chest. Thumb up.',lichaam:'Lean toward the arm, weight on chest.',aandacht:'Thumb up — sets the correct elbow angle.'},
+    {nr:2,titel:'Foot beside head',uitleg:'Place your foot (side of the arm) beside his head as pivot.',lichaam:'Hip as hinge point.',aandacht:'Foot flat on mat before you rotate.'},
+    {nr:3,titel:'Swing leg over head',uitleg:'Swing leg over his head, land on back. Arm trapped between legs.',lichaam:'Knees squeezed tight around arm.',aandacht:'Knees together — gap lets him pull arm out.'},
+    {nr:4,titel:'Hips up',uitleg:'Hips up against his elbow, wrist pulled down to chest.',lichaam:'Shoulders flat, hips bridge up.',aandacht:'No jerking — slow pressure is enough.'},
+  ], finishing:'Hips up, wrist down. Build pressure steadily.', veelgemaakte_fout:'Finishing with a jerk — injury risk and he can escape.', verdediging:[
+    {titel:'Thumb down',uitleg:'Turn thumb down as he swings his leg. Changes elbow angle.'},
+    {titel:'Clasp hands',uitleg:'Grab your own hands together. Much harder to extend arm.'},
+    {titel:'Stack',uitleg:'Roll forward and stack his legs onto him. Neutralizes the angle.'},
+  ]},
+  'Cross Collar Choke': { stappen:[
+    {nr:1,titel:'First collar grip',uitleg:'Drive dominant hand deep in collar, palm in, four fingers inside.',lichaam:'Upright in mount, weight on chest.',aandacht:'Deeper grip = more effective choke.'},
+    {nr:2,titel:'Cross grip',uitleg:'Other hand also in collar, palm out. Arms cross at his throat.',lichaam:'Lean slightly forward.',aandacht:'Both hands same side of throat.'},
+    {nr:3,titel:'Elbows to ground',uitleg:'Pull elbows down and outward. Forearms press both carotids.',lichaam:'Head low, torso forward.',aandacht:'Press with forearm bone, not hands.'},
+    {nr:4,titel:'Lock and squeeze',uitleg:'Increase pressure — both carotid arteries compressed simultaneously.',lichaam:'Hips low, stable mount.',aandacht:'Consistent steady pressure.'},
+  ], finishing:'Elbows down and apart — both carotids compressed at once.', veelgemaakte_fout:'Shallow grip or elbows staying high.', verdediging:[
+    {titel:'Chin to chest',uitleg:'Drop chin immediately. Blocks his grip depth.'},
+    {titel:'Push his elbows up',uitleg:'Use both hands to push his elbows up. Without downward pressure the choke fails.'},
+  ]},
+  'Triangle Choke': { stappen:[
+    {nr:1,titel:'Isolate arm and head',uitleg:'Push one arm to outside, pull his head down with other hand.',lichaam:'Move hips to side of attacked arm.',aandacht:'His arm must be outside your leg as you place it.'},
+    {nr:2,titel:'Leg over shoulder',uitleg:'Swing leg over his shoulder, knee crease on his neck.',lichaam:'Explosive hip rotation.',aandacht:'Over the shoulder — not over his head.'},
+    {nr:3,titel:'Close triangle',uitleg:'Lock ankle behind opposite knee. His arm trapped inside.',lichaam:'Pull his head down.',aandacht:'Keep trapped arm pulled tight to your body.'},
+    {nr:4,titel:'Angle and squeeze',uitleg:'Angle hips toward trapped arm, push head down.',lichaam:'Knees squeeze, hips as high as possible.',aandacht:'Angle is everything — flat hips = no pressure.'},
+  ], finishing:'Hips up, angle toward trapped arm. Knees squeeze.', veelgemaakte_fout:'Not angling the hips — flat = no pressure.', verdediging:[
+    {titel:'Pull arm out first',uitleg:'When his leg goes up, pull arm back immediately — before triangle closes.'},
+    {titel:'Build posture',uitleg:'Sit up straight and push his legs down. Straight back prevents closing.'},
+    {titel:'Stack',uitleg:'Stack his legs upward and turn toward trapped arm. Opens angle.'},
+  ]},
+  'Armbar from Guard': { stappen:[
+    {nr:1,titel:'Control the arm',uitleg:'Pull one arm to chest, both hands, thumb up.',lichaam:'Legs controlling, hips active.',aandacht:'Thumb up = elbow pointing outward.'},
+    {nr:2,titel:'Open guard and rotate',uitleg:'Foot on hip, leg over his face, rotate hips 90 degrees.',lichaam:'Explosive hip rotation.',aandacht:'Fast — he has time to escape if slow.'},
+    {nr:3,titel:'Leg over face',uitleg:'Leg tight over face, arm trapped between legs.',lichaam:'Knees squeezed, shoulders flat.',aandacht:'Squeeze knees — gap lets him rotate out.'},
+    {nr:4,titel:'Hips up',uitleg:'Hips up against elbow, wrist pulled down.',lichaam:'Shoulder blades flat, hips bridge.',aandacht:'Slow pressure — no jerk.'},
+  ], finishing:'Hips up against elbow, wrist toward chest.', veelgemaakte_fout:'Not fully controlling arm before rotating.', verdediging:[
+    {titel:'Pull arm before leg',uitleg:'Pull arm immediately back before his leg comes over.'},
+    {titel:'Thumb down and bend arm',uitleg:'Turn thumb down and bend arm firmly if leg already over.'},
+  ]},
+  'Kimura from Guard': { stappen:[
+    {nr:1,titel:'Break posture',uitleg:'Pull his head or shoulders down so he leans forward.',lichaam:'Legs active, pulling.',aandacht:'Without broken posture he pulls arm back easily.'},
+    {nr:2,titel:'Grip wrist',uitleg:'Grab his wrist, push to mat beside his hip.',lichaam:'Angle to side of attacked arm.',aandacht:'Grip the wrist, not forearm or hand.'},
+    {nr:3,titel:'Figure-four',uitleg:'Thread arm under his elbow, grab your own wrist. Lift elbow.',lichaam:'Elbow as lever under his arm.',aandacht:'Elbow bent 90 degrees — straight arm = no Kimura.'},
+    {nr:4,titel:'Rotate shoulder',uitleg:'Move his hand toward his back while keeping elbow up.',lichaam:'Use full torso for rotation.',aandacht:'Rotate toward his back, not upward.'},
+  ], finishing:'Hand to shoulder blade, elbow stays up.', veelgemaakte_fout:'Extending the arm — straight arm has no Kimura angle.', verdediging:[
+    {titel:'Extend the arm',uitleg:'Immediately extend arm — straight arm removes the angle.'},
+    {titel:'Roll with it',uitleg:'Roll in direction of rotation — takes pressure away.'},
+  ]},
+  'Rear Naked Choke': { stappen:[
+    {nr:1,titel:'Secure back mount',uitleg:'Sit firmly with both hooks in hips.',lichaam:'Back against his back, chin low.',aandacht:'Stable position first, then attack.'},
+    {nr:2,titel:'Arm under chin',uitleg:'Slide dominant forearm under his chin to other side. Forearm on carotid.',lichaam:'Elbow centered low, in front of throat.',aandacht:'Forearm bone on artery, not the hand.'},
+    {nr:3,titel:'Second arm support',uitleg:'Other hand behind his head or grab own bicep.',lichaam:'Elbows pulling toward each other.',aandacht:'Push head forward with support hand.'},
+    {nr:4,titel:'Squeeze and lean back',uitleg:'Squeeze both arms and lean back.',lichaam:'Extend body back, hooks firm.',aandacht:'Stay centered — lean too far to one side = lose position.'},
+  ], finishing:'Elbows squeeze, lean back. Both carotids compressed.', veelgemaakte_fout:'Using the hand instead of forearm — too thin to compress arteries.', verdediging:[
+    {titel:'Chin to chest and grab arm',uitleg:'Drop chin and grab his attacking arm with both hands immediately.'},
+    {titel:'Elbow down',uitleg:'Grab his attacking elbow and pull it downward.'},
+    {titel:'Lean forward',uitleg:'Leaning forward makes the choke much harder than leaning back.'},
+  ]},
+  'Armbar from Back Mount': { stappen:[
+    {nr:1,titel:'Control one arm',uitleg:'Grab arm with both hands, pull tight. Thumb up.',lichaam:'Hooks firm, angle toward attacked arm.',aandacht:'Thumb up.'},
+    {nr:2,titel:'Foot on hip',uitleg:'Remove lower hook, place that foot on his hip.',lichaam:'Keep arm control during repositioning.',aandacht:'Do not lose arm control.'},
+    {nr:3,titel:'Roll to back',uitleg:'Rotate hips, lie on back, leg over his head.',lichaam:'Use hips to rotate.',aandacht:'Quick and explosive.'},
+    {nr:4,titel:'Finish armbar',uitleg:'Knees tight, hips up against elbow.',lichaam:'Shoulders flat, hips high.',aandacht:'Slow pressure.'},
+  ], finishing:'Hips up, knees tight, wrist down.', veelgemaakte_fout:'Giving up back mount before fully controlling the arm.', verdediging:[
+    {titel:'Arm to body',uitleg:'Pull arm to chest and bend it immediately.'},
+    {titel:'Turn toward him',uitleg:'Turning toward him neutralizes the armbar angle.'},
+  ]},
+  'Clock Choke': { stappen:[
+    {nr:1,titel:'Collar grip',uitleg:'Arm over his back, hand deep under neck in collar, palm down.',lichaam:'Knee beside his hip.',aandacht:'Grip as deep as possible.'},
+    {nr:2,titel:'Support hand on mat',uitleg:'Free hand flat on mat beside his head as pivot.',lichaam:'Weight distributed.',aandacht:'Do not release collar grip.'},
+    {nr:3,titel:'Walk like clock',uitleg:'Small steps in arc around his head. Shoulder presses on neck.',lichaam:'Stay low, small steps.',aandacht:'Tighter around head = more pressure.'},
+    {nr:4,titel:'Belly down finish',uitleg:'Go to belly, pull collar up. Shoulder down.',lichaam:'Fully on belly, leg extended.',aandacht:'Simultaneous: collar up AND shoulder down.'},
+  ], finishing:'Collar up, shoulder down, fully on belly.', veelgemaakte_fout:'Staying too high during rotation — must be low and heavy.', verdediging:[
+    {titel:'Chin tuck and grab wrist',uitleg:'Drop chin and grab his wrist immediately.'},
+    {titel:'Rotate away',uitleg:'Rotate body in opposite direction to his rotation.'},
+  ]},
+  'Arm Triangle Choke': { stappen:[
+    {nr:1,titel:'Isolate arm',uitleg:'From mount push his arm up beside head. Your shoulder drives arm against his own neck.',lichaam:'Weight toward attacked arm.',aandacht:'His arm must press firmly against his neck — that is half the choke.'},
+    {nr:2,titel:'Grip behind head',uitleg:'Thread arm under his head and grab own bicep.',lichaam:'Elbow beside his head on mat.',aandacht:'Grip low and tight.'},
+    {nr:3,titel:'Transition to side control',uitleg:'Step to side control on the side of the trapped arm.',lichaam:'Controlled movement, keep grip.',aandacht:'Go to the trapped arm side — other side does not work.'},
+    {nr:4,titel:'Shoulder down finish',uitleg:'Shoulder down, head toward mat. His arm wedges into his own carotid.',lichaam:'Fully in side control, leg extended.',aandacht:'Tilt head toward mat — massively increases pressure.'},
+  ], finishing:'Shoulder down, head to mat. Arm as wedge in neck.', veelgemaakte_fout:'Not transitioning to side control — very hard to finish from mount.', verdediging:[
+    {titel:'Pull arm out',uitleg:'Pull arm away from neck before he can grip behind his head.'},
+    {titel:'Create space',uitleg:'Free hand pushes his shoulder away from your neck.'},
+  ]},
+  'Clock Choke from Turtle': { stappen:[
+    {nr:1,titel:'Collar grip',uitleg:'Beside turtle, arm over back, hand deep in collar.',lichaam:'Knee beside his hip.',aandacht:'Deep grip — shallow grip gives no pressure.'},
+    {nr:2,titel:'Support hand',uitleg:'Free hand flat on mat beside head.',lichaam:'Weight distributed.',aandacht:'Never release collar grip.'},
+    {nr:3,titel:'Walk like clock',uitleg:'Arc around his head, shoulder presses on neck.',lichaam:'Low and heavy.',aandacht:'Tight arc around head.'},
+    {nr:4,titel:'Belly down finish',uitleg:'Belly down, pull collar up, shoulder down.',lichaam:'Fully on belly.',aandacht:'Simultaneous movement.'},
+  ], finishing:'Collar up, shoulder down, on belly.', veelgemaakte_fout:'Too high during rotation.', verdediging:[
+    {titel:'Chin tuck',uitleg:'Drop chin and grab his wrist.'},
+    {titel:'Stand up',uitleg:'Explosively stand from turtle — disrupts his rotation.'},
+  ]},
+  'Guillotine from Turtle': { stappen:[
+    {nr:1,titel:'Arm under chin',uitleg:'In front of turtle, slide arm under chin. Forearm on throat, palm up.',lichaam:'Knees beside head.',aandacht:'Forearm on throat, not hand.'},
+    {nr:2,titel:'Grip wrist',uitleg:'Free hand grabs own wrist. Pull head to belly.',lichaam:'Elbow up.',aandacht:'Head close to body — space lets him tuck chin.'},
+    {nr:3,titel:'Roll to side',uitleg:'Roll to your side while holding his head.',lichaam:'Roll toward grip side.',aandacht:'Chin up on his arm — chin must not be tucked on your forearm.'},
+    {nr:4,titel:'Squeeze',uitleg:'Elbow up, extend hips, squeeze arms.',lichaam:'Hips extended, back straight.',aandacht:'Elbow up AND hips extend simultaneously.'},
+  ], finishing:'Elbow up, hips extend, squeeze.', veelgemaakte_fout:'Not holding head tight — space lets him tuck chin and block choke.', verdediging:[
+    {titel:'Chin tuck and turn',uitleg:'Drop chin immediately and turn neck away from his forearm.'},
+    {titel:'Stand up',uitleg:'Arm up and explosively stand — disrupts grip.'},
+  ]},
+  'Darce Choke from Turtle': { stappen:[
+    {nr:1,titel:'Arm under armpit',uitleg:'Thread arm (thumb up) under his armpit until hand comes out at his neck.',lichaam:'Weight on his back.',aandacht:'Elbow must pass his armpit — no leverage otherwise.'},
+    {nr:2,titel:'Grip neck',uitleg:'Bring hand to neck and grab back or side.',lichaam:'Arm rotated, elbow up.',aandacht:'Keep loop tight.'},
+    {nr:3,titel:'Figure-four close',uitleg:'Free hand grabs own bicep. Figure-four locked.',lichaam:'Both arms locked.',aandacht:'Press elbow down toward his chest.'},
+    {nr:4,titel:'Roll and finish',uitleg:'Roll him to his back. His arm compresses carotid.',lichaam:'Controlled roll.',aandacht:'Squeeze immediately after roll.'},
+  ], finishing:'Figure-four tighter after roll. His arm as wedge in carotid.', veelgemaakte_fout:'Not threading arm deep enough — elbow must pass armpit.', verdediging:[
+    {titel:'Shoulder forward',uitleg:'Actively push shoulder forward and down — blocks his elbow.'},
+    {titel:'Arm to body',uitleg:'Hold his attacking arm close to body with free hand.'},
+  ]},
+  'Crucifix Choke from Turtle': { stappen:[
+    {nr:1,titel:'Trap arm with legs',uitleg:'Thread leg under his body and trap one arm between your knees.',lichaam:'Roll to side, weight on his back.',aandacht:'Arm fully extended between legs.'},
+    {nr:2,titel:'Block other arm',uitleg:'Free arm grabs his other arm and pulls up along his back.',lichaam:'On side behind him, back to his chest.',aandacht:'Keep free arm pulled up.'},
+    {nr:3,titel:'Grip throat',uitleg:'Free hand under chin, grab collar or forearm on throat.',lichaam:'Forearm on carotid.',aandacht:'Both attacks simultaneous — trapped arm AND choke.'},
+    {nr:4,titel:'Squeeze',uitleg:'Legs squeeze, other arm up, forearm presses.',lichaam:'Hips extended, back straight.',aandacht:'Do not let leg grip loosen during choke.'},
+  ], finishing:'Legs squeeze, forearm on throat. Both arms blocked.', veelgemaakte_fout:'Attacking choke without fixing the arm — one free arm can break the grip.', verdediging:[
+    {titel:'Pull arm back first',uitleg:'Pull arm back before his leg comes over it.'},
+    {titel:'Roll toward him',uitleg:'Roll toward him, not away — removes the angle.'},
+  ]},
+  'Omoplata': { stappen:[
+    {nr:1,titel:'Isolate the arm',uitleg:'From guard control one arm. Push it outside and grip wrist with both hands.',lichaam:'Move hips toward attacked arm.',aandacht:'His arm must be isolated — if he retracts it you lose the angle.'},
+    {nr:2,titel:'Leg over arm',uitleg:'Swing leg over his arm, knee crease over his shoulder. Arm trapped between your leg and his body.',lichaam:'Explosive hip rotation.',aandacht:'Knee crease on shoulder — not on neck or elbow.'},
+    {nr:3,titel:'Open guard and sit up',uitleg:'Open guard and rotate 90 degrees to his side. Come up on hip or elbow.',lichaam:'Rotate torso away from him.',aandacht:'Keep his arm tight — he will try to roll.'},
+    {nr:4,titel:'Press shoulder down',uitleg:'Press leg down and rotate torso away. His shoulder is forced into painful rotation.',lichaam:'Sit upright, press leg down actively, torso away.',aandacht:'Rotate away, not toward him — that is the direction of pressure.'},
+  ], finishing:'Leg down while rotating away. Increase pressure steadily.', veelgemaakte_fout:'Rotating toward him instead of away — completely removes the shoulder pressure.', verdediging:[
+    {titel:'Pull arm before leg',uitleg:'When his leg goes up, pull arm back immediately — speed is critical.'},
+    {titel:'Forward roll',uitleg:'If omoplata is locked, roll forward over your head. Removes shoulder pressure — he may convert to sweep.'},
+  ]},
+};
+
+const WORPEN = [
+  { cat:'Arm Throws', kleur:'#c0392b', desc:'Throws where the opponent\'s arm serves as the lever.', worpen:[
+    { naam:'Seoi Nage', japans:'背負い投げ', uitleg:'One- or two-arm shoulder throw. Drop under opponent, grip his arm and throw him over your back.', kuzushi:'Pull him forward and downward', videoId:'5shl7rRm7i4' },
+    { naam:'Ippon Seoi Nage', japans:'一本背負い投げ', uitleg:'One-arm version of Seoi Nage. Arm under his armpit, elbow up as lever.', kuzushi:'Pull arm forward, break balance forward-right', videoId:'5shl7rRm7i4' },
+    { naam:'Tai Otoshi', japans:'体落とし', uitleg:'Body drop. Block his leg with yours and pull him over it with both arms.', kuzushi:'Strong pull forward and to the right', videoId:'AEwEKUtYHXI' },
+  ]},
+  { cat:'Shoulder Throws', kleur:'#8e44ad', desc:'Throws using the shoulder as the pivot point.', worpen:[
+    { naam:'Koshi Guruma', japans:'腰車', uitleg:'Hip wheel. Arm around his neck, rotate on hip and throw.', kuzushi:'Pull his head forward and down', videoId:'k1EGubrfzNg' },
+    { naam:'Kata Guruma', japans:'肩車', uitleg:'Shoulder wheel. Drop to knees, lift him onto shoulders and throw off.', kuzushi:'Pull arm forward, drop quickly to knees', videoId:'AEwEKUtYHXI' },
+    { naam:'Morote Seoi Nage', japans:'双手背負い投げ', uitleg:'Two-arm shoulder throw. Both arms grip sleeve and collar, rotate and throw over back.', kuzushi:'Pull strongly forward and down with both arms', videoId:'5shl7rRm7i4' },
+  ]},
+  { cat:'Hip Throws', kleur:'#e67e22', desc:'Throws where the hip is the pivot to throw opponent over.', worpen:[
+    { naam:'O Goshi', japans:'大腰', uitleg:'Major hip throw. Arm around his waist, hip drives in, throw him over.', kuzushi:'Pull forward, plant hip deep inside', videoId:'waxH8FA28IA' },
+    { naam:'Harai Goshi', japans:'払い腰', uitleg:'Sweeping hip throw. Hip in, sweep leg along his leg while throwing.', kuzushi:'Pull forward and up, actively sweep leg', videoId:'jNqVF4PTwVg' },
+    { naam:'Uki Goshi', japans:'浮き腰', uitleg:'Floating hip throw. Hip under his center, let him float and throw over hip.', kuzushi:'Pull forward and sideways', videoId:'waxH8FA28IA' },
+    { naam:'Uchi Mata', japans:'内股', uitleg:'Inner thigh throw. Throw leg between his legs and sweep inner thigh up.', kuzushi:'Pull forward and sideways, leg explosively up', videoId:'Jk1TC6xvE9Y' },
+  ]},
+  { cat:'Leg Throws', kleur:'#2980b9', desc:'Throws where the opponent\'s leg is swept, reaped or blocked.', worpen:[
+    { naam:'Osoto Gari', japans:'大外刈り', uitleg:'Major outer reap. Reap his leg from outside while pulling him backward.', kuzushi:'Pull him back and to the side', videoId:'5shl7rRm7i4' },
+    { naam:'Ouchi Gari', japans:'大内刈り', uitleg:'Major inner reap. Reap his leg from inside, pull him backward.', kuzushi:'Push him back and toward his heels', videoId:'AEwEKUtYHXI' },
+    { naam:'Kouchi Gari', japans:'小内刈り', uitleg:'Minor inner reap. Small quick reap of his ankle from inside.', kuzushi:'Light push back, small compact movement', videoId:'AEwEKUtYHXI' },
+    { naam:'Kosoto Gari', japans:'小外刈り', uitleg:'Minor outer reap. Hook his ankle from outside while pushing him sideways.', kuzushi:'Push sideways toward his heels', videoId:'AEwEKUtYHXI' },
+    { naam:'Okuri Ashi Barai', japans:'送り足払い', uitleg:'Sliding foot sweep. Sweep while he steps, at the moment his feet come together.', kuzushi:'Timing is everything — sweep on his step', videoId:'AEwEKUtYHXI' },
+  ]},
+  { cat:'Sacrifice Throws', kleur:'#16a085', desc:'Throws where you go to the ground to throw — high risk, high reward.', worpen:[
+    { naam:'Tomoe Nage', japans:'巴投げ', uitleg:'Circle throw. Fall backward, foot in his stomach and throw him in a circle over you.', kuzushi:'Pull strongly forward while falling backward', videoId:'1vznF7DTPY4' },
+    { naam:'Sumi Gaeshi', japans:'隅返し', uitleg:'Corner reversal. Fall backward and throw him over you via his leg.', kuzushi:'Pull toward the corner', videoId:'SS1cWImumzs' },
+    { naam:'Yoko Tomoe Nage', japans:'横巴投げ', uitleg:'Side circle throw. Like Tomoe Nage but sideways — effective when he adjusts his defense.', kuzushi:'Pull sideways and forward', videoId:'sKzuTjLiISQ' },
+  ]},
+];
+
+const TECHNIEK_CATS = [
+  { label:'Ground Positions', kleur:'#1e3a5f', items:['Mount','Guard (Closed)','Side Control','Back Mount','Half Guard','Turtle','North South','Kesa Gatame (Scarf Hold)','Ushiro Kesa Gatame (Reverse Scarf Hold)'] },
+  { label:'Submissions — Chokes', kleur:'#8e44ad', items:['Rear Naked Choke','Cross Collar Choke','Triangle Choke','Arm Triangle Choke','Clock Choke','Clock Choke from Turtle','Guillotine from Turtle','Darce Choke from Turtle','Crucifix Choke from Turtle'] },
+  { label:'Submissions — Joint Locks', kleur:'#c0392b', items:['Americana','Armbar from Mount','Armbar from Guard','Armbar from Back Mount','Kimura from Guard','Omoplata'] },
+  { label:'Throws — Arm Throws', kleur:'#e67e22', items:['Seoi Nage','Ippon Seoi Nage','Morote Seoi Nage','Tai Otoshi','Kata Guruma'] },
+  { label:'Throws — Hip Throws', kleur:'#16a085', items:['O Goshi','Harai Goshi','Uki Goshi','Uchi Mata','Koshi Guruma'] },
+  { label:'Throws — Leg Throws', kleur:'#2980b9', items:['Osoto Gari','Ouchi Gari','Kouchi Gari','Kosoto Gari','Okuri Ashi Barai'] },
+  { label:'Throws — Sacrifice', kleur:'#27ae60', items:['Tomoe Nage','Sumi Gaeshi','Yoko Tomoe Nage'] },
+  { label:'Defense / Escapes', kleur:'#7f8c8d', items:['Escape from Mount (Bridge)','Escape from Mount (Elbow-Knee)','Guard Break and Pass','Escape from Side Control','Escape from Back Mount','Escape from Half Guard','Escape from Turtle','Escape from North South','Escape from Kesa Gatame'] },
+];
+
+const VIDEOS = {
+  'Americana':'5M1wkbaOYUM','Armbar from Mount':'6W5eTSsM6EY','Cross Collar Choke':'8wLWTw8G0c0',
+  'Triangle Choke':'zWDyEFwX_pI','Armbar from Guard':'vCx_erA3yso','Kimura from Guard':'F3v5PpUY9o8',
+  'Rear Naked Choke':'5sctnAYFJ-g','Armbar from Back Mount':'yrl903y9jbg','Clock Choke':'jAGbvarXopw',
+  'Arm Triangle Choke':'fqYw8uqkBgQ','Clock Choke from Turtle':'ihQnprnIHBs','Guillotine from Turtle':'fv161huldUo',
+  'Darce Choke from Turtle':'z5ivorQAs9s','Crucifix Choke from Turtle':'bf6uxUzo0Wc','Omoplata':'5Mmo-YuV5cQ',
+};
+
+const DEFAULT_TECHNIEKEN = [
+  {id:1,naam:'Osoto Gari',cat:'worp',notities:'Major outer reap. Focus on kuzushi!',fav:true,pos:null},
+  {id:2,naam:'Rear Naked Choke',cat:'verwurging',notities:'Rear naked choke. Forearm, not hand.',fav:true,pos:'back-mount'},
+  {id:3,naam:'Armbar from Back Mount',cat:'joint',notities:'Armbar from back. Control elbow.',fav:false,pos:'back-mount'},
+  {id:4,naam:'Americana',cat:'joint',notities:'Shoulder lock from mount. Elbow below wrist.',fav:true,pos:'mount'},
+  {id:5,naam:'Armbar from Mount',cat:'joint',notities:'Leg over head, hips up. Thumb up.',fav:false,pos:'mount'},
+  {id:6,naam:'Cross Collar Choke',cat:'verwurging',notities:'Cross collar grip deep in collar. Elbows down.',fav:false,pos:'mount'},
+  {id:7,naam:'Triangle Choke',cat:'verwurging',notities:'Leg over shoulder, ankle in crease. Angle hips.',fav:true,pos:'guard'},
+  {id:8,naam:'Armbar from Guard',cat:'joint',notities:'Leg over face, hips up. Knees together.',fav:false,pos:'guard'},
+  {id:9,naam:'Kimura from Guard',cat:'joint',notities:'Figure-four grip. Rotate shoulder toward back.',fav:false,pos:'guard'},
+  {id:10,naam:'Clock Choke',cat:'verwurging',notities:'Deep collar grip, walk like clock, belly down.',fav:false,pos:'side-control'},
+  {id:11,naam:'Arm Triangle Choke',cat:'verwurging',notities:'Arm beside head, shoulder in neck, side control finish.',fav:false,pos:'mount'},
+  {id:12,naam:'Clock Choke from Turtle',cat:'verwurging',notities:'Deep collar, arc around head, belly down.',fav:false,pos:'turtle'},
+  {id:13,naam:'Guillotine from Turtle',cat:'verwurging',notities:'Arm under chin, grip wrist, roll to side.',fav:false,pos:'turtle'},
+  {id:14,naam:'Darce Choke from Turtle',cat:'verwurging',notities:'Arm under armpit, figure-four, roll.',fav:false,pos:'turtle'},
+  {id:15,naam:'Crucifix Choke from Turtle',cat:'verwurging',notities:'Trap arm with legs, block other arm, choke throat.',fav:false,pos:'turtle'},
+  {id:16,naam:'Omoplata',cat:'joint',notities:'Leg over shoulder, rotate away. Shoulder rotation to ground.',fav:false,pos:'guard'},
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE — plain object, no proxies
+// ═══════════════════════════════════════════════════════════
+function loadJSON(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e) { return fallback; }
+}
+
+const S = {
+  technieken: loadJSON('jj_tech', DEFAULT_TECHNIEKEN),
+  logboek:    loadJSON('jj_log', []),
+  sparring:   loadJSON('jj_sparring', []),
+  tab: 'posities',          // posities | worpen | technieken | logboek
+  positieId: null,          // selected position id
+  detailSubTab: 'subs',     // subs | escape
+  uitlegOpen: {},           // {techId: bool}
+  uitlegTab: {},            // {techId: 'video'|'stappen'|'verdediging'}
+  zoek: '',
+  globaalZoek: '',
+  catFilter: 'alle',
+  favFilter: false,
+  logSubTab: 'training',    // training | sparring
+  modal: null,              // null | 'techniek' | 'log' | 'sparring'
+  editId: null,
+  formPos: null,
+  // Form data — read from DOM at submit
+};
+
+function save() {
+  localStorage.setItem('jj_tech', JSON.stringify(S.technieken));
+}
+function saveLog() {
+  localStorage.setItem('jj_log', JSON.stringify(S.logboek));
+  localStorage.setItem('jj_sparring', JSON.stringify(S.sparring));
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER ENGINE — innerHTML, all handlers via delegation
+// ═══════════════════════════════════════════════════════════
+function render() {
+  document.getElementById('app').innerHTML = buildPage();
+  bindEvents();
+}
+
+function buildPage() {
+  if (S.positieId) return buildDetailPage();
+  return buildMainPage();
+}
+
+// ── MAIN PAGE ──
+function buildMainPage() {
+  const isSearch = S.globaalZoek.trim().length > 0;
+  return `
+    <div class="header">
+      <div class="header-top">
+        <div>
+          <div class="brand-sub">武術 · Jiu-Jitsu</div>
+          <div class="brand-title">Techniekboek</div>
+          <div class="brand-count">${S.technieken.length} techniques</div>
+        </div>
+        <button class="btn-primary" id="btn-new-tech">+ New</button>
+      </div>
+      <div class="search-wrap">
+        <input class="search-input" id="global-search" type="text" placeholder="🔍  Search technique, position or keyword..." value="${esc(S.globaalZoek)}">
+        <button class="search-clear" id="search-clear" style="display:${S.globaalZoek?'block':'none'}">×</button>
+      </div>
+      ${!isSearch ? `
+      <div class="tabs">
+        <button class="tab ${S.tab==='posities'?'active':''}" data-tab="posities">🥋 Positions</button>
+        <button class="tab ${S.tab==='worpen'?'active':''}" data-tab="worpen">🌀 Throws</button>
+        <button class="tab ${S.tab==='technieken'?'active':''}" data-tab="technieken">📋 Techniques</button>
+        <button class="tab ${S.tab==='logboek'?'active':''}" data-tab="logboek">📓 Log</button>
+      </div>` : ''}
+    </div>
+    <div class="main">
+      ${isSearch ? buildSearchResults() : buildTab()}
+    </div>
+    ${S.modal ? buildModal() : ''}
+  `;
+}
+
+function buildTab() {
+  if (S.tab === 'posities')  return buildPosities();
+  if (S.tab === 'worpen')    return buildWorpen();
+  if (S.tab === 'technieken') return buildTechnieken();
+  if (S.tab === 'logboek')   return buildLogboek();
+  return '';
+}
+
+// ── POSITIONS ──
+function buildPosities() {
+  return `
+    <div class="section-label">Tap a position to see submissions</div>
+    <div class="grid">
+      ${POSITIES.map(p => {
+        const subs = S.technieken.filter(t => t.pos === p.id);
+        return `<div class="pos-card" style="border-color:${p.kleur}" data-pos="${p.id}">
+          <div class="pos-japans" style="color:${p.kleur}">${p.japans}</div>
+          <div class="pos-naam">${p.naam}</div>
+          <div class="pos-footer">
+            <div><span class="pos-count-num" style="color:${subs.length?p.kleur:'#ccc'}">${subs.length}</span> <span style="color:var(--muted);font-size:13px">submission${subs.length!==1?'s':''}</span></div>
+            <div class="pos-bekijk" style="color:${p.kleur}">View →</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── DETAIL PAGE ──
+function buildDetailPage() {
+  const pos = POSITIES.find(p => p.id === S.positieId);
+  if (!pos) return '';
+  const subs = S.technieken.filter(t => t.pos === pos.id);
+  return `
+    <div class="detail-header" style="border-bottom-color:${pos.kleur}33">
+      <button class="btn-back" id="btn-back">← Back</button>
+      <div>
+        <div class="detail-pos-japans" style="color:${pos.kleur}">${pos.japans}</div>
+        <div class="detail-pos-naam">${pos.naam}</div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-sub-tabs">
+        <button class="detail-sub-tab ${S.detailSubTab==='subs'?'active':''}" data-sub="subs">⚔️ Submissions (${subs.length})</button>
+        <button class="detail-sub-tab ${S.detailSubTab==='escape'?'active':''}" data-sub="escape">🛡 Escape & Counter</button>
+      </div>
+      ${S.detailSubTab === 'subs' ? buildSubsTab(pos, subs) : buildEscapeTab(pos)}
+    </div>
+    ${S.modal ? buildModal() : ''}
+  `;
+}
+
+function buildSubsTab(pos, subs) {
+  return `
+    ${subs.length === 0
+      ? '<div class="empty">No submissions linked to this position yet.</div>'
+      : `<div class="grid">${subs.map(t => buildTechCard(t, false)).join('')}</div>`}
+    <button class="btn-add-sub" style="color:${pos.kleur};border:1px solid ${pos.kleur}" id="btn-add-sub">+ Add technique to ${pos.naam}</button>
+  `;
+}
+
+function buildEscapeTab(pos) {
+  const e = pos.escape;
+  if (!e) return '<div class="empty">No escape information available.</div>';
+  return `
+    <div class="escape-situatie" style="border-color:${pos.kleur}">📍 ${e.situatie}</div>
+    ${e.videoId ? `<div class="video-btn-wrap"><a class="video-btn" href="https://www.youtube.com/watch?v=${e.videoId}"><span class="play-icon"></span>Escape video on YouTube</a></div>` : ''}
+    <div class="section-label" style="margin-top:16px">How to escape</div>
+    ${e.stappen.map((s,i) => `
+      <div class="escape-stap">
+        <div class="stap-nr" style="background:${pos.kleur}22;border:1px solid ${pos.kleur}55;color:${pos.kleur}">${i+1}</div>
+        <div>
+          <div class="stap-titel">${s.titel}</div>
+          <div class="stap-uitleg">${s.uitleg}</div>
+        </div>
+      </div>`).join('')}
+    <div class="escape-counter" style="background:${pos.kleur}10;border:1px solid ${pos.kleur}33">
+      <div class="escape-counter-label" style="color:${pos.kleur}">⚔️ Counter</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.6">${e.counter}</div>
+    </div>
+  `;
+}
+
+// ── TECHNIQUE CARD ──
+function buildTechCard(t, showPos) {
+  const cat = CATS.find(c => c.id === t.cat);
+  const pos = POSITIES.find(p => p.id === t.pos);
+  const color = cat ? cat.color : '#888';
+  const u = UITLEG[t.naam];
+  const vid = VIDEOS[t.naam];
+  const open = S.uitlegOpen[t.id];
+  const utab = S.uitlegTab[t.id] || 'video';
+  const hasUitleg = u || vid;
+
+  return `<div class="tech-card" style="border-color:${color}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div style="flex:1;min-width:0">
+        <div class="tech-cat-label" style="color:${color}">${cat?cat.icon+' '+cat.label:''}</div>
+        <div class="tech-naam">${t.naam}</div>
+        <div class="tech-tags">
+          ${showPos && pos ? `<span class="tech-tag" style="color:${pos.kleur};border-color:${pos.kleur}44" data-goto-pos="${pos.id}">${pos.naam} →</span>` : ''}
+        </div>
+      </div>
+      <button class="btn-fav" data-fav="${t.id}" style="color:${t.fav?'#f59e0b':'#d1d5db'}">${t.fav?'★':'☆'}</button>
+    </div>
+    ${t.notities ? `<div class="tech-notities">${t.notities}</div>` : ''}
+    ${hasUitleg ? `
+      <button class="uitleg-toggle" style="border:1px solid ${open?color:color+'55'};color:${open?color:color+'88'};background:${open?'var(--faint)':'transparent'}" data-toggle-uitleg="${t.id}">
+        ${open ? '▲ Hide' : '▼ Details & Video'}
+      </button>
+      ${open ? `
+        <div class="uitleg-panel" style="border:1px solid ${color}33;border-top:2px solid ${color}">
+          <div class="uitleg-tabs">
+            ${vid ? `<button class="uitleg-tab ${utab==='video'?'active':''}" style="${utab==='video'?'color:'+color+';border-color:'+color:''}" data-uitleg-tab="${t.id}:video">▶ Video</button>` : ''}
+            ${u   ? `<button class="uitleg-tab ${utab==='stappen'?'active':''}" style="${utab==='stappen'?'color:'+color+';border-color:'+color:''}" data-uitleg-tab="${t.id}:stappen">📋 Steps</button>` : ''}
+            ${u&&u.verdediging ? `<button class="uitleg-tab ${utab==='verdediging'?'active':''}" style="${utab==='verdediging'?'color:'+color+';border-color:'+color:''}" data-uitleg-tab="${t.id}:verdediging">🛡 Defense</button>` : ''}
+          </div>
+          <div class="uitleg-body">
+            ${utab==='video' && vid ? buildVideoTab(t.naam, vid) : ''}
+            ${utab==='stappen' && u ? buildStappenTab(u, color) : ''}
+            ${utab==='verdediging' && u && u.verdediging ? buildVerdTab(u.verdediging) : ''}
+          </div>
+        </div>` : ''}
+    ` : ''}
+    <div class="tech-actions">
+      <button class="btn-sm" data-edit="${t.id}">Edit</button>
+      <button class="btn-sm btn-del" data-del="${t.id}">Delete</button>
+    </div>
+  </div>`;
+}
+
+function buildVideoTab(naam, videoId) {
+  return `<div class="video-btn-wrap"><a class="video-btn" href="https://www.youtube.com/watch?v=${videoId}"><span class="play-icon"></span>Watch on YouTube</a></div>`;
+}
+
+function buildStappenTab(u, color) {
+  return `
+    <div class="section-label">Execution</div>
+    ${u.stappen.map(s => `
+      <div class="stap">
+        <div class="stap-nr" style="background:${color}22;border:1px solid ${color}55;color:${color}">${s.nr}</div>
+        <div style="flex:1">
+          <div class="stap-titel">${s.titel}</div>
+          <div class="stap-uitleg">${s.uitleg}</div>
+          <div class="stap-lichaam" style="border-color:${color}44"><strong style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Body: </strong>${s.lichaam}</div>
+          <div class="stap-aandacht"><span style="color:#f59e0b">!</span>${s.aandacht}</div>
+        </div>
+      </div>`).join('')}
+    <div class="finishing-grid">
+      <div class="finish-box" style="background:${color}12;border:1px solid ${color}33">
+        <div class="finish-label" style="color:${color}">🎯 Finishing</div>
+        <div class="finish-text">${u.finishing}</div>
+      </div>
+      <div class="finish-box" style="background:var(--accent-light);border:1px solid #fecaca">
+        <div class="finish-label" style="color:var(--accent)">⚠ Common mistake</div>
+        <div class="finish-text">${u.veelgemaakte_fout}</div>
+      </div>
+    </div>`;
+}
+
+function buildVerdTab(verdediging) {
+  return `
+    <div class="section-label">Defense against this technique</div>
+    ${verdediging.map(v => `
+      <div class="verd-item">
+        <div class="verd-icon-wrap">🛡</div>
+        <div>
+          <div class="verd-titel">${v.titel}</div>
+          <div class="verd-uitleg">${v.uitleg}</div>
+        </div>
+      </div>`).join('')}`;
+}
+
+// ── THROWS ──
+function buildWorpen() {
+  return WORPEN.map(cat => `
+    <div style="margin-bottom:32px">
+      <div class="worp-cat-header">
+        <div style="width:4px;height:36px;background:${cat.kleur};border-radius:2px;flex-shrink:0"></div>
+        <div>
+          <div class="worp-cat-title" style="color:${cat.kleur}">${cat.cat}</div>
+          <div class="worp-cat-desc">${cat.desc}</div>
+        </div>
+      </div>
+      <div class="grid">
+        ${cat.worpen.map(w => `
+          <div class="worp-card" style="border-color:${cat.kleur}">
+            <div class="worp-naam">${w.naam}</div>
+            <div class="worp-japans">${w.japans}</div>
+            <div class="worp-uitleg">${w.uitleg}</div>
+            <div class="kuzushi-box" style="border-color:${cat.kleur}88;background:${cat.kleur}10">
+              <div class="kuzushi-label" style="color:${cat.kleur}">Kuzushi</div>
+              <div class="kuzushi-text">${w.kuzushi}</div>
+            </div>
+            ${w.videoId ? `<div class="video-btn-wrap"><a class="video-btn" href="https://www.youtube.com/watch?v=${w.videoId}"><span class="play-icon"></span>Video</a></div>` : ''}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ── ALL TECHNIQUES ──
+function buildTechnieken() {
+  const filtered = S.technieken.filter(t => {
+    if (S.catFilter !== 'alle' && t.cat !== S.catFilter) return false;
+    if (S.favFilter && !t.fav) return false;
+    if (S.zoek) {
+      const q = S.zoek.toLowerCase();
+      if (!t.naam.toLowerCase().includes(q) && !t.notities.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+  return `
+    <div class="search-bar">
+      <input type="text" id="tech-search" placeholder="Search..." value="${esc(S.zoek)}">
+      <button class="btn-fav-filter ${S.favFilter?'on':''}" id="fav-filter-btn">★ Favs</button>
+    </div>
+    <div class="filter-bar">
+      <button class="cat-btn ${S.catFilter==='alle'?'on':''}" style="${S.catFilter==='alle'?'background:#1e3a5f;color:#fff;border-color:#1e3a5f':''}" data-cat="alle">All</button>
+      ${CATS.map(c => `<button class="cat-btn ${S.catFilter===c.id?'on':''}" style="${S.catFilter===c.id?'background:'+c.color+';border-color:'+c.color:''}" data-cat="${c.id}">${c.icon} ${c.label}</button>`).join('')}
+    </div>
+    ${filtered.length === 0
+      ? '<div class="empty">No techniques found.</div>'
+      : `<div class="grid">${filtered.map(t => buildTechCard(t, true)).join('')}</div>`}`;
+}
+
+// ── LOGBOEK ──
+function buildLogboek() {
+  return `
+    <div class="log-sub-tabs">
+      <button class="log-sub-tab ${S.logSubTab==='training'?'active':''}" data-logtab="training">📅 Training Log</button>
+      <button class="log-sub-tab ${S.logSubTab==='sparring'?'active':''}" data-logtab="sparring">🥊 Sparring Notes</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button id="btn-export" style="background:transparent;border:1px solid var(--blue);color:var(--blue);padding:8px 14px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:6px;cursor:pointer">⬇ Export backup</button>
+      <label id="btn-import-label" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 14px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:6px;cursor:pointer">⬆ Import backup<input type="file" id="btn-import" accept=".json" style="display:none"></label>
+    </div>
+    ${S.logSubTab === 'training' ? buildTrainingLog() : buildSparringLog()}`;
+}
+
+function buildTrainingLog() {
+  const entries = [...S.logboek].reverse();
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${S.logboek.length} session${S.logboek.length!==1?'s':''} logged</div>
+      <button class="btn-primary" id="btn-open-log-form">+ Log Session</button>
+    </div>
+    ${entries.map(log => `
+      <div class="log-entry">
+        <div class="log-entry-header">
+          <div>
+            <div class="log-datum">${fmtDate(log.datum)}</div>
+            ${log.partner ? `<div class="log-partner">👤 with ${log.partner}</div>` : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="log-count-badge">${(log.technieken||[]).length} techniques</span>
+            <button class="btn-del-entry" data-del-log="${log.id}">✕</button>
+          </div>
+        </div>
+        ${(log.technieken||[]).length > 0 ? `<div class="tech-chips">${log.technieken.map(n => `<span class="tech-chip">${n}</span>`).join('')}</div>` : ''}
+        ${log.notities ? `<div class="log-notities">${log.notities}</div>` : ''}
+      </div>`).join('')}
+    ${entries.length === 0 ? '<div class="empty">No sessions logged yet.</div>' : ''}`;
+}
+
+function buildSparringLog() {
+  const entries = [...S.sparring].reverse();
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${S.sparring.length} session${S.sparring.length!==1?'s':''} logged</div>
+      <button class="btn-primary" style="background:var(--accent)" id="btn-open-sparring-form">+ Log Sparring</button>
+    </div>
+    ${entries.map(log => `
+      <div class="log-entry sparring-entry">
+        <div class="log-entry-header">
+          <div>
+            <div class="log-datum">${fmtDate(log.datum)}</div>
+            ${log.partner ? `<div class="log-partner">🥊 vs ${log.partner}</div>` : ''}
+          </div>
+          <button class="btn-del-entry" data-del-sparring="${log.id}">✕</button>
+        </div>
+        ${log.werkte ? `<div class="sparring-section"><div class="sparring-section-label" style="color:#16a085">✅ What worked</div><div class="sparring-section-text">${log.werkte}</div></div>` : ''}
+        ${log.mislukte ? `<div class="sparring-section"><div class="sparring-section-label" style="color:var(--accent)">❌ What did not work</div><div class="sparring-section-text">${log.mislukte}</div></div>` : ''}
+        ${log.lessen ? `<div class="takeaway-box"><div class="sparring-section-label" style="color:#92400e">💡 Take to next session</div><div class="sparring-section-text">${log.lessen}</div></div>` : ''}
+      </div>`).join('')}
+    ${entries.length === 0 ? '<div class="empty">No sparring sessions logged yet.</div>' : ''}`;
+}
+
+// ── SEARCH ──
+function buildSearchResults() {
+  const q = S.globaalZoek.toLowerCase().trim();
+  function hi(t) {
+    const i = t.toLowerCase().indexOf(q);
+    if (i < 0) return t;
+    return t.slice(0,i) + '<mark>' + t.slice(i,i+q.length) + '</mark>' + t.slice(i+q.length);
+  }
+  const techs = S.technieken.filter(t => t.naam.toLowerCase().includes(q) || t.notities.toLowerCase().includes(q));
+  const poss = POSITIES.filter(p => p.naam.toLowerCase().includes(q) || p.japans.toLowerCase().includes(q));
+  const total = techs.length + poss.length;
+  return `
+    <div class="search-results-label">${total} result${total!==1?'s':''} for "${S.globaalZoek}"</div>
+    ${poss.length > 0 ? `
+      <div class="result-group-label">Positions (${poss.length})</div>
+      <div class="grid" style="margin-bottom:24px">
+        ${poss.map(p => {
+          const subs = S.technieken.filter(t => t.pos === p.id);
+          return `<div class="pos-card" style="border-color:${p.kleur}" data-pos="${p.id}">
+            <div class="pos-japans" style="color:${p.kleur}">${p.japans}</div>
+            <div class="pos-naam">${hi(p.naam)}</div>
+            <div class="pos-footer">
+              <div><span class="pos-count-num" style="color:${p.kleur}">${subs.length}</span> <span style="color:var(--muted);font-size:13px">submissions</span></div>
+              <div class="pos-bekijk" style="color:${p.kleur}">View →</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+    ${techs.length > 0 ? `
+      <div class="result-group-label">Techniques (${techs.length})</div>
+      <div class="grid">${techs.map(t => buildTechCard(t, true)).join('')}</div>` : ''}
+    ${total === 0 ? '<div class="empty">No results found. Try a different search.</div>' : ''}`;
+}
+
+// ── MODAL ──
+function buildModal() {
+  if (S.modal === 'techniek') return buildTechModal();
+  if (S.modal === 'log')      return buildLogModal();
+  if (S.modal === 'sparring') return buildSparringModal();
+  return '';
+}
+
+function buildTechModal() {
+  const t = S.editId ? S.technieken.find(x => x.id === S.editId) : null;
+  return `<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-title">${t ? 'Edit Technique' : 'New Technique'}</div>
+      <label class="form-label">Name</label>
+      <input class="form-input" id="f-naam" type="text" value="${esc(t?t.naam:'')}" placeholder="e.g. Americana">
+      <label class="form-label">Category</label>
+      <select class="form-input" id="f-cat">
+        ${CATS.map(c => `<option value="${c.id}" ${(t&&t.cat===c.id)?'selected':''}>${c.icon} ${c.label}</option>`).join('')}
+      </select>
+      <label class="form-label">Link to position (optional)</label>
+      <select class="form-input" id="f-pos">
+        <option value="">— None —</option>
+        ${POSITIES.map(p => `<option value="${p.id}" ${(t&&t.pos===p.id)||(S.formPos===p.id&&!t)?'selected':''}>${p.naam}</option>`).join('')}
+      </select>
+      <label class="form-label">Notes</label>
+      <textarea class="form-input" id="f-notities" rows="3" placeholder="Tips, key points...">${esc(t?t.notities:'')}</textarea>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <input type="checkbox" id="f-fav" ${(t&&t.fav)?'checked':''} style="width:16px;height:16px">
+        <label for="f-fav" style="font-size:15px;cursor:pointer">★ Mark as favourite</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-save" id="btn-save-tech">Save</button>
+        <button class="btn-cancel" id="btn-close-modal">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildLogModal() {
+  const today = new Date().toISOString().split('T')[0];
+  return `<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-title" style="color:var(--blue)">Log Training Session</div>
+      <label class="form-label">Date</label>
+      <input class="form-input" id="f-log-datum" type="date" value="${today}">
+      <label class="form-label">Training partner (optional)</label>
+      <input class="form-input" id="f-log-partner" type="text" placeholder="Partner name...">
+      <label class="form-label">Techniques practiced</label>
+      <div class="techniek-list" id="techniek-list">
+        ${TECHNIEK_CATS.map(cat => `
+          <div class="techniek-cat-label" style="color:${cat.kleur}">${cat.label}</div>
+          ${cat.items.map(naam => `
+            <label class="techniek-check-row">
+              <input type="checkbox" class="log-tech-check" value="${esc(naam)}">
+              <span class="techniek-check-label">${naam}</span>
+            </label>`).join('')}
+        `).join('')}
+      </div>
+      <label class="form-label">Notes</label>
+      <textarea class="form-input" id="f-log-notities" rows="3" placeholder="What did you learn? What went well?"></textarea>
+      <div class="modal-actions">
+        <button class="btn-save" id="btn-save-log">Save Session</button>
+        <button class="btn-cancel" id="btn-close-modal">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildSparringModal() {
+  const today = new Date().toISOString().split('T')[0];
+  return `<div class="modal-overlay" id="modal-overlay">
+    <div class="modal sparring-form">
+      <div class="modal-title">Log Sparring Session</div>
+      <label class="form-label">Date</label>
+      <input class="form-input" id="f-sp-datum" type="date" value="${today}">
+      <label class="form-label">Opponent (optional)</label>
+      <input class="form-input" id="f-sp-partner" type="text" placeholder="Name or description...">
+      <label class="form-label">✅ What worked?</label>
+      <textarea class="form-input" id="f-sp-werkte" rows="3" placeholder="Which techniques worked?"></textarea>
+      <label class="form-label">❌ What did not work?</label>
+      <textarea class="form-input" id="f-sp-mislukte" rows="3" placeholder="Where did you lose position?"></textarea>
+      <label class="form-label">💡 Take to next session?</label>
+      <textarea class="form-input" id="f-sp-lessen" rows="3" placeholder="Focus point for next training..."></textarea>
+      <div class="modal-actions">
+        <button class="btn-save btn-save-sparring" id="btn-save-sparring">Save Session</button>
+        <button class="btn-cancel" id="btn-close-modal">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── HELPERS ──
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(d) {
+  if (!d) return '';
+  try { return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+  catch(e) { return d; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// EVENT DELEGATION — one listener on document
+// ═══════════════════════════════════════════════════════════
+function bindEvents() {
+  // Search inputs — debounced, no render on every keystroke
+  const gs = document.getElementById('global-search');
+  if (gs) gs.addEventListener('input', e => {
+    S.globaalZoek = e.target.value;
+    clearTimeout(gs._t);
+    gs._t = setTimeout(render, 300);
+  });
+
+  const ts = document.getElementById('tech-search');
+  if (ts) ts.addEventListener('input', e => {
+    S.zoek = e.target.value;
+    clearTimeout(ts._t);
+    ts._t = setTimeout(render, 300);
+  });
+
+  // Import backup file
+  const imp = document.getElementById('btn-import');
+  if (imp) imp.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.logboek || !data.sparring) { alert('Invalid backup file.'); return; }
+        if (!confirm('This will replace your current log data. Continue?')) return;
+        S.logboek = data.logboek;
+        S.sparring = data.sparring;
+        saveLog();
+        render();
+        alert('Backup imported!');
+      } catch(err) {
+        alert('Could not read file. Make sure it is a valid backup JSON.');
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+document.addEventListener('click', function(e) {
+  const el = e.target;
+
+  // ── Navigation ──
+  if (el.dataset.tab) { S.tab = el.dataset.tab; render(); return; }
+  if (el.dataset.pos) { S.positieId = el.dataset.pos; S.detailSubTab = 'subs'; render(); return; }
+  if (el.dataset.sub) { S.detailSubTab = el.dataset.sub; render(); return; }
+  if (el.dataset.logtab) { S.logSubTab = el.dataset.logtab; render(); return; }
+  if (el.dataset.gotoPos) { S.positieId = el.dataset.gotoPos; S.detailSubTab = 'subs'; render(); return; }
+
+  // ── Header buttons ──
+  if (el.id === 'btn-new-tech') { S.modal = 'techniek'; S.editId = null; S.formPos = null; render(); return; }
+  if (el.id === 'btn-back') { S.positieId = null; render(); return; }
+  if (el.id === 'btn-add-sub') { S.modal = 'techniek'; S.editId = null; S.formPos = S.positieId; render(); return; }
+  if (el.id === 'search-clear') { S.globaalZoek = ''; render(); return; }
+  if (el.id === 'fav-filter-btn') { S.favFilter = !S.favFilter; render(); return; }
+  if (el.dataset.cat) { S.catFilter = el.dataset.cat; render(); return; }
+
+  // ── Technique actions ──
+  if (el.dataset.fav) { const id=parseInt(el.dataset.fav); S.technieken=S.technieken.map(t=>t.id===id?{...t,fav:!t.fav}:t); save(); render(); return; }
+  if (el.dataset.edit) { S.modal='techniek'; S.editId=parseInt(el.dataset.edit); S.formPos=null; render(); return; }
+  if (el.dataset.del) {
+    if (confirm('Delete this technique?')) { S.technieken=S.technieken.filter(t=>t.id!==parseInt(el.dataset.del)); save(); render(); }
+    return;
+  }
+  if (el.dataset.toggleUitleg) { const id=parseInt(el.dataset.toggleUitleg); S.uitlegOpen[id]=!S.uitlegOpen[id]; render(); return; }
+  if (el.dataset.uitlegTab) {
+    const [id,tab]=el.dataset.uitlegTab.split(':');
+    S.uitlegTab[parseInt(id)]=tab; render(); return;
+  }
+
+  // ── Log actions ──
+  if (el.id === 'btn-export') {
+    const data = {
+      versie: 1,
+      datum: new Date().toISOString(),
+      logboek: S.logboek,
+      sparring: S.sparring,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jijitsu-backup-' + new Date().toISOString().split('T')[0] + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    return;
+  }
+  if (el.id === 'btn-open-sparring-form') { S.modal = 'sparring'; render(); return; }
+  if (el.dataset.delLog) {
+    if (confirm('Delete this session?')) { S.logboek=S.logboek.filter(l=>l.id!==parseInt(el.dataset.delLog)); saveLog(); render(); }
+    return;
+  }
+  if (el.dataset.delSparring) {
+    if (confirm('Delete this sparring note?')) { S.sparring=S.sparring.filter(l=>l.id!==parseInt(el.dataset.delSparring)); saveLog(); render(); }
+    return;
+  }
+
+  // ── Modal ──
+  if (el.id === 'modal-overlay') { S.modal=null; S.editId=null; render(); return; }
+  if (el.id === 'btn-close-modal') { S.modal=null; S.editId=null; render(); return; }
+
+  if (el.id === 'btn-save-tech') {
+    const naam = document.getElementById('f-naam').value.trim();
+    if (!naam) { alert('Please enter a name.'); return; }
+    const cat = document.getElementById('f-cat').value;
+    const pos = document.getElementById('f-pos').value || null;
+    const notities = document.getElementById('f-notities').value.trim();
+    const fav = document.getElementById('f-fav').checked;
+    if (S.editId) {
+      S.technieken = S.technieken.map(t => t.id===S.editId ? {...t,naam,cat,pos,notities,fav} : t);
+    } else {
+      S.technieken.push({id:Date.now(),naam,cat,pos,notities,fav});
+    }
+    save(); S.modal=null; S.editId=null; render(); return;
+  }
+
+  if (el.id === 'btn-save-log') {
+    const datum = document.getElementById('f-log-datum').value;
+    const partner = document.getElementById('f-log-partner').value.trim();
+    const notities = document.getElementById('f-log-notities').value.trim();
+    const technieken = [...document.querySelectorAll('.log-tech-check:checked')].map(cb => cb.value);
+    S.logboek.push({id:Date.now(),datum,partner,notities,technieken});
+    saveLog(); S.modal=null; render(); return;
+  }
+
+  if (el.id === 'btn-save-sparring') {
+    const datum = document.getElementById('f-sp-datum').value;
+    const partner = document.getElementById('f-sp-partner').value.trim();
+    const werkte = document.getElementById('f-sp-werkte').value.trim();
+    const mislukte = document.getElementById('f-sp-mislukte').value.trim();
+    const lessen = document.getElementById('f-sp-lessen').value.trim();
+    S.sparring.push({id:Date.now(),datum,partner,werkte,mislukte,lessen});
+    saveLog(); S.modal=null; render(); return;
+  }
+}, true); // capture phase so pos-card click doesn't fire before child button
+
+// Make sure inner buttons don't trigger pos-card navigation
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-fav],button[data-edit],button[data-del],button[data-del-log],button[data-del-sparring],button.uitleg-toggle,button[data-uitleg-tab],button[data-toggle-uitleg]');
+  if (btn && btn.closest('.pos-card')) e.stopPropagation();
+}, false);
+
+// ── Initial render ──
+render();
+</script>
+</body>
+</html>
