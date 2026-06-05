@@ -21,7 +21,9 @@ export const groundPositions = [
       { name: "Triangle Choke", defense: "Pull arm out + build posture + stack", link: "https://www.youtube.com/watch?v=zWDyEFwX_pI" },
       { name: "Armbar from Guard", defense: "Pull arm before leg + thumb down", link: "https://www.youtube.com/watch?v=vCx_erA3yso" },
       { name: "Kimura from Guard", defense: "Extend arm + roll with rotation", link: "https://www.youtube.com/watch?v=F3v5PpUY9o8" },
-      { name: "Omoplata", defense: "Pull arm before leg + forward roll", link: "https://www.youtube.com/watch?v=5Mmo-YuV5cQ" }
+      { name: "Omoplata", defense: "Pull arm before leg + forward roll", link: "https://www.youtube.com/watch?v=5Mmo-YuV5cQ" },
+      { name: "Heel Hook", defense: "Turn knee in same direction as heel + don't straighten leg + tap early", link: "https://www.youtube.com/watch?v=SXeWbPl_una" 
+},
     ]
   },
   {
