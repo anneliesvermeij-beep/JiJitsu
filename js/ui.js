@@ -1,5 +1,8 @@
+// js/ui.js - Alle rendering logica
+
 import { groundPositions, throwsData } from './data.js';
 import { getState, setState } from './state.js';
+import { getNote, saveNote } from './log.js'; 
 
 export function renderApp() {
   const app = document.getElementById("app");
@@ -40,15 +43,40 @@ export function renderApp() {
         <button onclick="window.backToList()" style="margin-bottom:20px; padding:8px 16px; background:#666; color:white; border:none; border-radius:6px; cursor:pointer;">← Terug</button>
         <h2>${pos.name}</h2>
       `;
-      pos.submissions.forEach((sub, i) => {
-        html += `
-          <div class="submission">
-            <h4 style="margin:0 0 8px; color:#c0392b;">${i+1}. ${sub.name}</h4>
-            <div class="defense"><strong>Verdediging:</strong> ${sub.defense}</div>
-            <a href="${sub.link}" target="_blank" class="youtube-link">▶ Video voorbeeld</a>
-          </div>
-        `;
-      });
+pos.submissions.forEach((sub, index) => {
+  const saved = getNote(sub.name);
+  html += `
+    <div class="submission-card">
+      <h3>${index + 1}. ${sub.name}</h3>
+      <div style="margin:10px 0; color:var(--muted);">
+        <strong>Verdediging:</strong><br>
+        ${sub.defense}
+      </div>
+      <a href="${sub.link}" target="_blank" class="youtube-link">
+        ▶ Bekijk video voorbeeld
+      </a>
+
+      <div class="log-section">
+        <div class="log-label">📝 Mijn aantekeningen</div>
+        <textarea
+          id="note-${index}"
+          class="log-textarea"
+          placeholder="Schrijf hier je aantekeningen..."
+        >${saved ? saved.note : ''}</textarea>
+        <div class="log-footer">
+          <span class="log-date">
+            ${saved ? `Laatst opgeslagen: ${saved.date}` : 'Nog geen aantekeningen'}
+          </span>
+          <button
+            class="log-save-btn"
+            onclick="window.saveLog('${sub.name}', ${index})">
+            Opslaan
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+});
     }
   } else {
     html += `<h2>Worpen (4 categorieën)</h2>`;
@@ -83,4 +111,18 @@ window.showPositionDetail = function(id) {
 window.backToList = function() {
   setState({ selectedPosition: null });
   renderApp();
+};
+window.saveLog = function(name, index) {
+  const textarea = document.getElementById(`note-${index}`);
+  if (!textarea) return;
+  saveNote(name, textarea.value);
+
+  // Toon bevestiging
+  const btn = textarea.parentElement.querySelector('.log-save-btn');
+  btn.textContent = '✓ Opgeslagen';
+  btn.style.background = 'var(--success)';
+  setTimeout(() => {
+    btn.textContent = 'Opslaan';
+    btn.style.background = '';
+  }, 2000);
 };
