@@ -538,3 +538,151 @@ body {
   .tabs         { gap: 6px; }
   .tab          { padding: 10px 14px; font-size: 14px; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   GROUND TAB REDESIGN
+   ══════════════════════════════════════════════════════════ */
+
+.section-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  color: var(--text);
+}
+
+/* ── Level 1: Position cards ─────────────────────────────── */
+
+.pos-card {
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pos-card:active {
+  transform: scale(0.985);
+}
+
+.pos-photo {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px 10px 0 0;
+}
+
+.pos-card-body {
+  padding: 14px 16px 18px;
+}
+
+.pos-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 3px;
+  color: var(--text);
+}
+
+.pos-japanese {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+.pos-japanese-inline {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+/* ── Tips bullet list ────────────────────────────────────── */
+
+.tips-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tips-list li {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* ── Back button ─────────────────────────────────────────── */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+.back-btn:active {
+  opacity: 0.65;
+}
+
+/* ── Level 2: Submission cards ───────────────────────────── */
+
+.sub-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.sub-thumbnail-link {
+  display: block;
+  line-height: 0;
+}
+
+.sub-thumbnail {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.sub-card-body {
+  padding: 14px 16px 18px;
+}
+
+.sub-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: var(--text);
+}
+
+.sub-defense {
+  margin: 12px 0 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.sub-defense-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+@media (max-width: 400px) {
+  .pos-photo     { height: 160px; }
+  .sub-name      { font-size: 0.97rem; }
+  .tips-list li  { font-size: 0.82rem; }
+}

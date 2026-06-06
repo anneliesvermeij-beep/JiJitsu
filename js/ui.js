@@ -1,4 +1,4 @@
-// js/ui.js - Alle rendering logica
+// js/ui.js
 
 import { groundPositions, throwsData } from './data.js';
 import { getState, setState } from './state.js';
@@ -6,7 +6,6 @@ import { getNote, saveNote, getProgress, saveProgress, saveSession,
          loadSessionsSortedByDate, deleteSession, getSessionsForTechnique,
          getStats, NIVEAUS, NIVEAU_LABELS, NIVEAU_ICONS } from './log.js';
 
-// ─── Alle technieken als platte lijst (nodig voor sessieformulier) ───────────
 function getAllTechnieken() {
   const uit = [];
   groundPositions.forEach(pos =>
@@ -18,14 +17,18 @@ function getAllTechnieken() {
   return uit;
 }
 
-// ─── Hoofd render ────────────────────────────────────────────────────────────
+function getYouTubeId(url) {
+  const match = url.match(/[?&]v=([^&]+)/);
+  return match ? match[1] : null;
+}
+
+// ─── Main render ─────────────────────────────────────────────────────────────
 
 export function renderApp() {
   const app = document.getElementById("app");
   const state = getState();
   let html = "";
 
-  // Header
   html += `
     <div class="header">
       <div>
@@ -36,7 +39,6 @@ export function renderApp() {
     </div>
   `;
 
-  // Tabs — nu met logboek
   html += `
     <div class="tabs">
       <button class="tab ${state.currentTab === 'ground'   ? 'active' : ''}" onclick="window.switchTab('ground')">🥋 Grond</button>
@@ -45,7 +47,6 @@ export function renderApp() {
     </div>
   `;
 
-  // Tab-inhoud
   if (state.currentTab === "ground") {
     html += renderGroundTab(state);
   } else if (state.currentTab === "throws") {
@@ -57,88 +58,119 @@ export function renderApp() {
   app.innerHTML = html;
 }
 
-// ─── Grond-tab (ongewijzigd + voortgang & sessie-history per techniek) ───────
+// ─── Ground tab ──────────────────────────────────────────────────────────────
 
 function renderGroundTab(state) {
   let html = "";
 
   if (!state.selectedPosition) {
-    html += `<h2>Grond Posities</h2>`;
+    // Level 1 — position list
+    html += `<h2 class="section-heading">Ground Positions</h2>`;
     groundPositions.forEach(pos => {
       html += `
-        <div class="position-card" onclick="window.showPositionDetail('${pos.id}')" style="border-left: 5px solid ${pos.color}">
-          <div style="color:#666; font-size:13px;">${pos.japanese}</div>
-          <h3 style="margin:8px 0;">${pos.name}</h3>
+        <div class="position-card pos-card" onclick="window.showPositionDetail('${pos.id}')">
+          <img
+            class="pos-photo"
+            src="${pos.photo}"
+            alt="${pos.name}"
+            loading="lazy"
+            onerror="this.style.display='none'"
+          >
+          <div class="pos-card-body">
+            <h3 class="pos-name">${pos.name}</h3>
+            <div class="pos-japanese">${pos.japanese}</div>
+            <ul class="tips-list">
+              ${pos.tips.map(t => `<li>${t}</li>`).join('')}
+            </ul>
+          </div>
         </div>
       `;
     });
   } else {
+    // Level 2 — submissions for selected position
     const pos = groundPositions.find(p => p.id === state.selectedPosition);
     html += `
-      <button onclick="window.backToList()" style="margin-bottom:20px; padding:8px 16px; background:#666; color:white; border:none; border-radius:6px; cursor:pointer;">← Terug</button>
-      <h2>${pos.name}</h2>
+      <button class="back-btn" onclick="window.backToList()">← Back</button>
+      <h2 class="section-heading">
+        ${pos.name}
+        <span class="pos-japanese-inline">${pos.japanese}</span>
+      </h2>
     `;
 
     pos.submissions.forEach((sub, index) => {
-      const saved    = getNote(sub.name);
+      const saved   = getNote(sub.name);
       const progress = getProgress(sub.name);
       const history  = getSessionsForTechnique(sub.name);
+      const videoId  = getYouTubeId(sub.link);
 
       html += `
-        <div class="submission-card">
-          <h3>${index + 1}. ${sub.name}</h3>
-
-          <div style="margin:10px 0; color:var(--muted);">
-            <strong>Verdediging:</strong><br>${sub.defense}
-          </div>
-
-          <a href="${sub.link}" target="_blank" class="youtube-link">▶ Bekijk video voorbeeld</a>
-
-          <!-- Voortgang -->
-          <div class="log-section" style="margin-top:12px;">
-            <div class="log-label">📈 Voortgang</div>
-            <div class="niveau-knoppen">
-              ${NIVEAUS.map(n => `
-                <button
-                  class="niveau-btn ${progress === n ? 'actief niveau-' + n : ''}"
-                  onclick="window.setProgress('${sub.name}', '${n}', this)"
-                  title="${NIVEAU_LABELS[n]}">
-                  ${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}
-                </button>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- Aantekening -->
-          <div class="log-section">
-            <div class="log-label">📝 Mijn aantekeningen</div>
-            <textarea
-              id="note-${index}"
-              class="log-textarea"
-              placeholder="Schrijf hier je aantekeningen..."
-            >${saved ? saved.note : ''}</textarea>
-            <div class="log-footer">
-              <span class="log-date">
-                ${saved ? `Laatst opgeslagen: ${saved.date}` : 'Nog geen aantekeningen'}
-              </span>
-              <button class="log-save-btn" onclick="window.saveLog('${sub.name}', ${index})">Opslaan</button>
-            </div>
-          </div>
-
-          <!-- Sessie-history -->
-          ${history.length > 0 ? `
-            <div class="log-section">
-              <div class="log-label">🗓 Eerder geoefend</div>
-              <ul class="techniek-history">
-                ${history.map(h => `
-                  <li>
-                    <span class="history-datum">${formatDatum(h.datum)}</span>
-                    ${h.niveau ? `<span class="niveau-badge niveau-${h.niveau}">${NIVEAU_ICONS[h.niveau]} ${NIVEAU_LABELS[h.niveau]}</span>` : ''}
-                  </li>
-                `).join('')}
-              </ul>
-            </div>
+        <div class="sub-card">
+          ${videoId ? `
+            <a href="${sub.link}" target="_blank" class="sub-thumbnail-link">
+              <img
+                class="sub-thumbnail"
+                src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg"
+                alt="${sub.name} tutorial"
+                loading="lazy"
+              >
+            </a>
           ` : ''}
+          <div class="sub-card-body">
+            <h3 class="sub-name">${sub.name}</h3>
+
+            <ul class="tips-list">
+              ${sub.tips.map(t => `<li>${t}</li>`).join('')}
+            </ul>
+
+            <div class="sub-defense">
+              <span class="sub-defense-label">Defense:</span> ${sub.defense}
+            </div>
+
+            <a href="${sub.link}" target="_blank" class="youtube-link">▶ Watch video</a>
+
+            <div class="log-section" style="margin-top:12px;">
+              <div class="log-label">📈 Progress</div>
+              <div class="niveau-knoppen">
+                ${NIVEAUS.map(n => `
+                  <button
+                    class="niveau-btn ${progress === n ? 'actief niveau-' + n : ''}"
+                    onclick="window.setProgress('${sub.name}', '${n}', this)"
+                    title="${NIVEAU_LABELS[n]}">
+                    ${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="log-section">
+              <div class="log-label">📝 My notes</div>
+              <textarea
+                id="note-${index}"
+                class="log-textarea"
+                placeholder="Write your notes here..."
+              >${saved ? saved.note : ''}</textarea>
+              <div class="log-footer">
+                <span class="log-date">
+                  ${saved ? `Last saved: ${saved.date}` : 'No notes yet'}
+                </span>
+                <button class="log-save-btn" onclick="window.saveLog('${sub.name}', ${index})">Save</button>
+              </div>
+            </div>
+
+            ${history.length > 0 ? `
+              <div class="log-section">
+                <div class="log-label">🗓 Practiced before</div>
+                <ul class="techniek-history">
+                  ${history.map(h => `
+                    <li>
+                      <span class="history-datum">${formatDatum(h.datum)}</span>
+                      ${h.niveau ? `<span class="niveau-badge niveau-${h.niveau}">${NIVEAU_ICONS[h.niveau]} ${NIVEAU_LABELS[h.niveau]}</span>` : ''}
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            ` : ''}
+          </div>
         </div>
       `;
     });
@@ -147,7 +179,7 @@ function renderGroundTab(state) {
   return html;
 }
 
-// ─── Worpen-tab (ongewijzigd + voortgang per worp) ────────────────────────
+// ─── Throws tab (unchanged) ───────────────────────────────────────────────────
 
 function renderThrowsTab() {
   let html = `<h2>Worpen (4 categorieën)</h2>`;
@@ -183,7 +215,7 @@ function renderThrowsTab() {
   return html;
 }
 
-// ─── Logboek-tab ──────────────────────────────────────────────────────────
+// ─── Logboek tab (unchanged) ──────────────────────────────────────────────────
 
 function renderLogboekTab(state) {
   const logTab = state.logTab || 'nieuw';
@@ -283,8 +315,8 @@ function renderOverzicht() {
 }
 
 function renderStats() {
-  const stats    = getStats();
-  const voortgang = loadAllProgress();
+  const stats      = getStats();
+  const voortgang  = loadAllProgress();
   const alleTechnieken = getAllTechnieken();
 
   const metVoortgang = alleTechnieken.filter(n => voortgang[n]);
@@ -353,11 +385,13 @@ window.switchLogTab = function(logTab) {
 window.showPositionDetail = function(id) {
   setState({ selectedPosition: id });
   renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 window.backToList = function() {
   setState({ selectedPosition: null });
   renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 window.saveLog = function(name, index) {
@@ -365,14 +399,13 @@ window.saveLog = function(name, index) {
   if (!textarea) return;
   saveNote(name, textarea.value);
   const btn = textarea.parentElement.querySelector('.log-save-btn');
-  btn.textContent = '✓ Opgeslagen';
+  btn.textContent = '✓ Saved';
   btn.style.background = 'var(--success)';
-  setTimeout(() => { btn.textContent = 'Opslaan'; btn.style.background = ''; }, 2000);
+  setTimeout(() => { btn.textContent = 'Save'; btn.style.background = ''; }, 2000);
 };
 
 window.setProgress = function(naam, niveau, btn) {
   saveProgress(naam, niveau);
-  // Visuele feedback zonder volledige re-render
   const knoppen = btn.closest('.niveau-knoppen').querySelectorAll('.niveau-btn');
   knoppen.forEach(k => {
     k.className = 'niveau-btn';
@@ -421,7 +454,7 @@ window.verwijderSessie = function(id) {
   }
 };
 
-// ─── Hulpfuncties ─────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDatum(iso) {
   const [jaar, maand, dag] = iso.split('-');
@@ -433,7 +466,6 @@ function escapeHTML(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// Nodig door stats-render (importeer vanuit log.js via closure)
 function loadAllProgress() {
   try { return JSON.parse(localStorage.getItem('jijitsu_progress')) || {}; } catch { return {}; }
 }
