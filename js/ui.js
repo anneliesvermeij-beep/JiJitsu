@@ -2,13 +2,30 @@
 
 import { groundPositions, throwsData } from './data.js';
 import { getState, setState } from './state.js';
-import { getNote, saveNote } from './log.js'; 
+import { getNote, saveNote, getProgress, saveProgress, saveSession,
+         loadSessionsSortedByDate, deleteSession, getSessionsForTechnique,
+         getStats, NIVEAUS, NIVEAU_LABELS, NIVEAU_ICONS } from './log.js';
+
+// ─── Alle technieken als platte lijst (nodig voor sessieformulier) ───────────
+function getAllTechnieken() {
+  const uit = [];
+  groundPositions.forEach(pos =>
+    pos.submissions.forEach(sub => uit.push(sub.name))
+  );
+  Object.values(throwsData).forEach(cat =>
+    cat.forEach(t => uit.push(t.name))
+  );
+  return uit;
+}
+
+// ─── Hoofd render ────────────────────────────────────────────────────────────
 
 export function renderApp() {
   const app = document.getElementById("app");
   const state = getState();
   let html = "";
 
+  // Header
   html += `
     <div class="header">
       <div>
@@ -19,87 +36,317 @@ export function renderApp() {
     </div>
   `;
 
+  // Tabs — nu met logboek
   html += `
     <div class="tabs">
-      <button class="tab ${state.currentTab === 'ground' ? 'active' : ''}" onclick="window.switchTab('ground')">🥋 Grond Posities</button>
-      <button class="tab ${state.currentTab === 'throws' ? 'active' : ''}" onclick="window.switchTab('throws')">🌀 Worpen (4 categorieën)</button>
+      <button class="tab ${state.currentTab === 'ground'   ? 'active' : ''}" onclick="window.switchTab('ground')">🥋 Grond</button>
+      <button class="tab ${state.currentTab === 'throws'   ? 'active' : ''}" onclick="window.switchTab('throws')">🌀 Worpen</button>
+      <button class="tab ${state.currentTab === 'logboek'  ? 'active' : ''}" onclick="window.switchTab('logboek')">📓 Logboek</button>
     </div>
   `;
 
+  // Tab-inhoud
   if (state.currentTab === "ground") {
-    if (!state.selectedPosition) {
-      html += `<h2>Grond Posities</h2>`;
-      groundPositions.forEach(pos => {
-        html += `
-          <div class="position-card" onclick="window.showPositionDetail('${pos.id}')" style="border-left: 5px solid ${pos.color}">
-            <div style="color:#666; font-size:13px;">${pos.japanese}</div>
-            <h3 style="margin:8px 0;">${pos.name}</h3>
-          </div>
-        `;
-      });
-    } else {
-      const pos = groundPositions.find(p => p.id === state.selectedPosition);
-      html += `
-        <button onclick="window.backToList()" style="margin-bottom:20px; padding:8px 16px; background:#666; color:white; border:none; border-radius:6px; cursor:pointer;">← Terug</button>
-        <h2>${pos.name}</h2>
-      `;
-pos.submissions.forEach((sub, index) => {
-  const saved = getNote(sub.name);
-  html += `
-    <div class="submission-card">
-      <h3>${index + 1}. ${sub.name}</h3>
-      <div style="margin:10px 0; color:var(--muted);">
-        <strong>Verdediging:</strong><br>
-        ${sub.defense}
-      </div>
-      <a href="${sub.link}" target="_blank" class="youtube-link">
-        ▶ Bekijk video voorbeeld
-      </a>
-
-      <div class="log-section">
-        <div class="log-label">📝 Mijn aantekeningen</div>
-        <textarea
-          id="note-${index}"
-          class="log-textarea"
-          placeholder="Schrijf hier je aantekeningen..."
-        >${saved ? saved.note : ''}</textarea>
-        <div class="log-footer">
-          <span class="log-date">
-            ${saved ? `Laatst opgeslagen: ${saved.date}` : 'Nog geen aantekeningen'}
-          </span>
-          <button
-            class="log-save-btn"
-            onclick="window.saveLog('${sub.name}', ${index})">
-            Opslaan
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-});
-    }
-  } else {
-    html += `<h2>Worpen (4 categorieën)</h2>`;
-    Object.keys(throwsData).forEach(category => {
-      html += `<div class="category-title" style="color:#c0392b; border-color:#c0392b;">${category}</div>`;
-      throwsData[category].forEach(t => {
-        html += `
-          <div class="submission">
-            <h4 style="margin:0 0 6px;">${t.name}</h4>
-            <div style="font-size:14px;">${t.description}</div>
-            <div style="font-size:13px; color:#666; margin:6px 0;"><strong>Kuzushi:</strong> ${t.kuzushi}</div>
-            <a href="${t.link}" target="_blank" class="youtube-link">▶ Video voorbeeld</a>
-          </div>
-        `;
-      });
-    });
+    html += renderGroundTab(state);
+  } else if (state.currentTab === "throws") {
+    html += renderThrowsTab();
+  } else if (state.currentTab === "logboek") {
+    html += renderLogboekTab(state);
   }
 
   app.innerHTML = html;
 }
 
+// ─── Grond-tab (ongewijzigd + voortgang & sessie-history per techniek) ───────
+
+function renderGroundTab(state) {
+  let html = "";
+
+  if (!state.selectedPosition) {
+    html += `<h2>Grond Posities</h2>`;
+    groundPositions.forEach(pos => {
+      html += `
+        <div class="position-card" onclick="window.showPositionDetail('${pos.id}')" style="border-left: 5px solid ${pos.color}">
+          <div style="color:#666; font-size:13px;">${pos.japanese}</div>
+          <h3 style="margin:8px 0;">${pos.name}</h3>
+        </div>
+      `;
+    });
+  } else {
+    const pos = groundPositions.find(p => p.id === state.selectedPosition);
+    html += `
+      <button onclick="window.backToList()" style="margin-bottom:20px; padding:8px 16px; background:#666; color:white; border:none; border-radius:6px; cursor:pointer;">← Terug</button>
+      <h2>${pos.name}</h2>
+    `;
+
+    pos.submissions.forEach((sub, index) => {
+      const saved    = getNote(sub.name);
+      const progress = getProgress(sub.name);
+      const history  = getSessionsForTechnique(sub.name);
+
+      html += `
+        <div class="submission-card">
+          <h3>${index + 1}. ${sub.name}</h3>
+
+          <div style="margin:10px 0; color:var(--muted);">
+            <strong>Verdediging:</strong><br>${sub.defense}
+          </div>
+
+          <a href="${sub.link}" target="_blank" class="youtube-link">▶ Bekijk video voorbeeld</a>
+
+          <!-- Voortgang -->
+          <div class="log-section" style="margin-top:12px;">
+            <div class="log-label">📈 Voortgang</div>
+            <div class="niveau-knoppen">
+              ${NIVEAUS.map(n => `
+                <button
+                  class="niveau-btn ${progress === n ? 'actief niveau-' + n : ''}"
+                  onclick="window.setProgress('${sub.name}', '${n}', this)"
+                  title="${NIVEAU_LABELS[n]}">
+                  ${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Aantekening -->
+          <div class="log-section">
+            <div class="log-label">📝 Mijn aantekeningen</div>
+            <textarea
+              id="note-${index}"
+              class="log-textarea"
+              placeholder="Schrijf hier je aantekeningen..."
+            >${saved ? saved.note : ''}</textarea>
+            <div class="log-footer">
+              <span class="log-date">
+                ${saved ? `Laatst opgeslagen: ${saved.date}` : 'Nog geen aantekeningen'}
+              </span>
+              <button class="log-save-btn" onclick="window.saveLog('${sub.name}', ${index})">Opslaan</button>
+            </div>
+          </div>
+
+          <!-- Sessie-history -->
+          ${history.length > 0 ? `
+            <div class="log-section">
+              <div class="log-label">🗓 Eerder geoefend</div>
+              <ul class="techniek-history">
+                ${history.map(h => `
+                  <li>
+                    <span class="history-datum">${formatDatum(h.datum)}</span>
+                    ${h.niveau ? `<span class="niveau-badge niveau-${h.niveau}">${NIVEAU_ICONS[h.niveau]} ${NIVEAU_LABELS[h.niveau]}</span>` : ''}
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
+  }
+
+  return html;
+}
+
+// ─── Worpen-tab (ongewijzigd + voortgang per worp) ────────────────────────
+
+function renderThrowsTab() {
+  let html = `<h2>Worpen (4 categorieën)</h2>`;
+
+  Object.keys(throwsData).forEach(category => {
+    html += `<div class="category-title" style="color:#c0392b; border-color:#c0392b;">${category}</div>`;
+    throwsData[category].forEach(t => {
+      const progress = getProgress(t.name);
+      html += `
+        <div class="submission">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+            <h4 style="margin:0 0 6px;">${t.name}</h4>
+            ${progress ? `<span class="niveau-badge niveau-${progress}">${NIVEAU_ICONS[progress]} ${NIVEAU_LABELS[progress]}</span>` : ''}
+          </div>
+          <div style="font-size:14px;">${t.description}</div>
+          <div style="font-size:13px; color:#666; margin:6px 0;"><strong>Kuzushi:</strong> ${t.kuzushi}</div>
+          <a href="${t.link}" target="_blank" class="youtube-link">▶ Video voorbeeld</a>
+          <div class="niveau-knoppen" style="margin-top:10px;">
+            ${NIVEAUS.map(n => `
+              <button
+                class="niveau-btn ${progress === n ? 'actief niveau-' + n : ''}"
+                onclick="window.setProgress('${t.name}', '${n}', this)"
+                title="${NIVEAU_LABELS[n]}">
+                ${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    });
+  });
+
+  return html;
+}
+
+// ─── Logboek-tab ──────────────────────────────────────────────────────────
+
+function renderLogboekTab(state) {
+  const logTab = state.logTab || 'nieuw';
+
+  let html = `
+    <div class="logboek-tabs">
+      <button class="logboek-tab ${logTab === 'nieuw'     ? 'active' : ''}" onclick="window.switchLogTab('nieuw')">➕ Nieuw loggen</button>
+      <button class="logboek-tab ${logTab === 'overzicht' ? 'active' : ''}" onclick="window.switchLogTab('overzicht')">📋 Overzicht</button>
+      <button class="logboek-tab ${logTab === 'stats'     ? 'active' : ''}" onclick="window.switchLogTab('stats')">📊 Voortgang</button>
+    </div>
+  `;
+
+  if (logTab === 'nieuw')     html += renderNieuwSessieForm();
+  if (logTab === 'overzicht') html += renderOverzicht();
+  if (logTab === 'stats')     html += renderStats();
+
+  return html;
+}
+
+function renderNieuwSessieForm() {
+  const vandaag = new Date().toISOString().split('T')[0];
+  const alleTechnieken = getAllTechnieken();
+
+  let html = `
+    <div class="sessie-form">
+      <h2 class="logboek-titel">Nieuwe trainingssessie</h2>
+
+      <div class="form-veld">
+        <label for="sessie-datum">Datum</label>
+        <input type="date" id="sessie-datum" value="${vandaag}" max="${vandaag}">
+      </div>
+
+      <div class="form-veld">
+        <label for="techniek-zoek">Zoek techniek</label>
+        <input type="text" id="techniek-zoek" placeholder="Bijv. armbar, seoi nage..." autocomplete="off" oninput="window.filterTechnieken(this.value)">
+      </div>
+
+      <div class="technieken-selectie" id="technieken-selectie">
+        ${alleTechnieken.map((naam, i) => {
+          const progress = getProgress(naam);
+          return `
+            <div class="techniek-log-item" data-naam="${naam.toLowerCase()}" data-index="${i}">
+              <div class="techniek-log-header">
+                <span class="techniek-log-naam">${naam}</span>
+                <select class="niveau-select" id="niveau-${i}">
+                  <option value="">— niveau —</option>
+                  ${NIVEAUS.map(n => `<option value="${n}" ${progress === n ? 'selected' : ''}>${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}</option>`).join('')}
+                </select>
+              </div>
+              <textarea class="log-aantekening" id="sessie-note-${i}" placeholder="Aantekening (optioneel)..." rows="2"></textarea>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div class="sessie-acties">
+        <button class="btn-opslaan" onclick="window.slaSessionOp()">💾 Sessie opslaan</button>
+      </div>
+      <div id="sessie-feedback" class="sessie-feedback"></div>
+    </div>
+  `;
+
+  return html;
+}
+
+function renderOverzicht() {
+  const sessies = loadSessionsSortedByDate();
+
+  if (sessies.length === 0) {
+    return `<div class="logboek-leeg"><p>Nog geen sessies gelogd.</p><p>Ga naar <strong>Nieuw loggen</strong> om je eerste les bij te houden.</p></div>`;
+  }
+
+  let html = `<h2 class="logboek-titel">Alle trainingen</h2>`;
+
+  sessies.forEach(sessie => {
+    html += `
+      <div class="sessie-kaart">
+        <div class="sessie-kaart-header">
+          <span class="sessie-datum">${formatDatum(sessie.datum)}</span>
+          <span class="sessie-techniek-count">${sessie.technieken.length} techniek(en)</span>
+          <button class="btn-verwijder-sessie" onclick="window.verwijderSessie('${sessie.id}')" aria-label="Verwijder sessie">🗑️</button>
+        </div>
+        <ul class="sessie-techniek-lijst">
+          ${sessie.technieken.map(t => `
+            <li class="sessie-techniek-entry">
+              <span class="sessie-techniek-naam">${t.naam}</span>
+              ${t.niveau ? `<span class="niveau-badge niveau-${t.niveau}">${NIVEAU_ICONS[t.niveau]} ${NIVEAU_LABELS[t.niveau]}</span>` : ''}
+              ${t.aantekening ? `<p class="sessie-aantekening">${escapeHTML(t.aantekening)}</p>` : ''}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `;
+  });
+
+  return html;
+}
+
+function renderStats() {
+  const stats    = getStats();
+  const voortgang = loadAllProgress();
+  const alleTechnieken = getAllTechnieken();
+
+  const metVoortgang = alleTechnieken.filter(n => voortgang[n]);
+  const totaal = alleTechnieken.length;
+
+  let html = `
+    <h2 class="logboek-titel">Voortgang & Statistieken</h2>
+
+    <div class="stats-samenvatting">
+      <div class="stat-kaart">
+        <span class="stat-getal">${stats.totaalSessies}</span>
+        <span class="stat-label">Trainingen</span>
+      </div>
+      <div class="stat-kaart">
+        <span class="stat-getal">${stats.uniekteTechnieken}</span>
+        <span class="stat-label">Geoefend</span>
+      </div>
+      <div class="stat-kaart">
+        <span class="stat-getal">${stats.verdeling.beheerst}</span>
+        <span class="stat-label">Beheerst</span>
+      </div>
+    </div>
+
+    <div class="niveau-balk-wrapper">
+      ${NIVEAUS.map(n => `
+        <div class="niveau-balk-rij">
+          <span class="niveau-balk-label">${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}</span>
+          <div class="niveau-balk">
+            <div class="niveau-balk-vulling niveau-${n}" style="width:${totaal ? Math.round(stats.verdeling[n]/totaal*100) : 0}%"></div>
+          </div>
+          <span class="niveau-balk-count">${stats.verdeling[n]}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  if (metVoortgang.length > 0) {
+    html += `<h3 class="stats-subtitel">Technieken met voortgang</h3><div class="voortgang-lijst">`;
+    metVoortgang.forEach(naam => {
+      const n = voortgang[naam];
+      html += `
+        <div class="voortgang-item">
+          <span class="voortgang-naam">${naam}</span>
+          <span class="niveau-badge niveau-${n}">${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}</span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  return html;
+}
+
+// ─── Window globals ───────────────────────────────────────────────────────────
+
 window.switchTab = function(tab) {
-  setState({ currentTab: tab, selectedPosition: null });
+  setState({ currentTab: tab, selectedPosition: null, logTab: 'nieuw' });
+  renderApp();
+};
+
+window.switchLogTab = function(logTab) {
+  setState({ logTab });
   renderApp();
 };
 
@@ -112,17 +359,81 @@ window.backToList = function() {
   setState({ selectedPosition: null });
   renderApp();
 };
+
 window.saveLog = function(name, index) {
   const textarea = document.getElementById(`note-${index}`);
   if (!textarea) return;
   saveNote(name, textarea.value);
-
-  // Toon bevestiging
   const btn = textarea.parentElement.querySelector('.log-save-btn');
   btn.textContent = '✓ Opgeslagen';
   btn.style.background = 'var(--success)';
-  setTimeout(() => {
-    btn.textContent = 'Opslaan';
-    btn.style.background = '';
-  }, 2000);
+  setTimeout(() => { btn.textContent = 'Opslaan'; btn.style.background = ''; }, 2000);
 };
+
+window.setProgress = function(naam, niveau, btn) {
+  saveProgress(naam, niveau);
+  // Visuele feedback zonder volledige re-render
+  const knoppen = btn.closest('.niveau-knoppen').querySelectorAll('.niveau-btn');
+  knoppen.forEach(k => {
+    k.className = 'niveau-btn';
+    NIVEAUS.forEach(n => { if (k.title === NIVEAU_LABELS[n] && n === niveau) k.classList.add('actief', 'niveau-' + n); });
+  });
+};
+
+window.filterTechnieken = function(query) {
+  const items = document.querySelectorAll('.techniek-log-item');
+  items.forEach(item => {
+    item.style.display = item.dataset.naam.includes(query.toLowerCase()) ? '' : 'none';
+  });
+};
+
+window.slaSessionOp = function() {
+  const datum = document.getElementById('sessie-datum')?.value;
+  const alleTechnieken = getAllTechnieken();
+  const technieken = [];
+
+  alleTechnieken.forEach((naam, i) => {
+    const aantekening = document.getElementById(`sessie-note-${i}`)?.value?.trim() || '';
+    const niveau      = document.getElementById(`niveau-${i}`)?.value || '';
+    if (aantekening || niveau) {
+      technieken.push({ naam, aantekening, niveau });
+    }
+  });
+
+  const feedback = document.getElementById('sessie-feedback');
+
+  if (technieken.length === 0) {
+    feedback.textContent = '⚠️ Voeg minstens één techniek toe met aantekening of niveau.';
+    feedback.className = 'sessie-feedback fout';
+    return;
+  }
+
+  saveSession(datum, technieken);
+  feedback.textContent = `✅ Sessie opgeslagen met ${technieken.length} techniek(en)!`;
+  feedback.className = 'sessie-feedback succes';
+  setTimeout(() => { setState({ logTab: 'overzicht' }); renderApp(); }, 1200);
+};
+
+window.verwijderSessie = function(id) {
+  if (confirm('Deze sessie verwijderen?')) {
+    deleteSession(id);
+    renderApp();
+  }
+};
+
+// ─── Hulpfuncties ─────────────────────────────────────────────────────────────
+
+function formatDatum(iso) {
+  const [jaar, maand, dag] = iso.split('-');
+  const m = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  return `${parseInt(dag)} ${m[parseInt(maand)-1]} ${jaar}`;
+}
+
+function escapeHTML(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Nodig door stats-render (importeer vanuit log.js via closure)
+function loadAllProgress() {
+  try { return JSON.parse(localStorage.getItem('jijitsu_progress')) || {}; } catch { return {}; }
+}

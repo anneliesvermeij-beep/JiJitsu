@@ -5,6 +5,9 @@
   --muted: #78716c;
   --accent: #c0392b;
   --blue: #1e3a5f;
+  --border: #e2e0db;
+  --header-bg: #f0ede8;
+  --success: #27ae60;
 }
 
 [data-theme="dark"] {
@@ -14,6 +17,9 @@
   --muted: #a8a29e;
   --accent: #e74c3c;
   --blue: #4a90e2;
+  --border: #3a3733;
+  --header-bg: #2f2d2a;
+  --success: #2ecc71;
 }
 
 body {
@@ -50,6 +56,8 @@ body {
   display: flex;
   gap: 10px;
   margin-bottom: 25px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tab {
@@ -60,6 +68,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
+  white-space: nowrap;
 }
 
 .tab.active {
@@ -69,7 +78,7 @@ body {
 
 .position-card, .submission {
   background: var(--card);
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 18px;
   margin-bottom: 14px;
@@ -103,7 +112,9 @@ body {
   padding-bottom: 6px;
   border-bottom: 3px solid;
 }
-/* Trainingslogboek */
+
+/* ── Bestaande logboek-stijlen ───────────────────────────── */
+
 .log-section {
   margin-top: 18px;
   padding-top: 16px;
@@ -132,6 +143,7 @@ body {
   resize: vertical;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .log-textarea:focus {
@@ -165,4 +177,364 @@ body {
 
 .log-save-btn:hover {
   opacity: 0.85;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LOGBOEK-TAB — nieuw toegevoegd
+   ══════════════════════════════════════════════════════════ */
+
+/* ─── Sub-tabs ───────────────────────────────────────────── */
+
+.logboek-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.logboek-tab {
+  flex: 1;
+  min-width: max-content;
+  padding: 0.55rem 0.9rem;
+  border: none;
+  background: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.logboek-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 700;
+}
+
+/* ─── Formulier ──────────────────────────────────────────── */
+
+.sessie-form { display: flex; flex-direction: column; gap: 1rem; }
+
+.logboek-titel {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.stats-subtitel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+
+.form-veld { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.form-veld label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.form-veld input[type="date"],
+.form-veld input[type="text"] {
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--card);
+  color: var(--text);
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-veld input:focus { outline: none; border-color: var(--blue); }
+
+/* ─── Techniek selectielijst ─────────────────────────────── */
+
+.technieken-selectie {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 52vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.techniek-log-item {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: border-color 0.2s;
+}
+
+.techniek-log-item:focus-within { border-color: var(--blue); }
+
+.techniek-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.techniek-log-naam {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text);
+  flex: 1;
+}
+
+.niveau-select {
+  font-size: 0.78rem;
+  padding: 0.28rem 0.45rem;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.niveau-select:focus { outline: none; border-color: var(--blue); }
+
+.log-aantekening {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.45rem 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.log-aantekening:focus { outline: none; border-color: var(--blue); }
+
+/* ─── Opslaan knop & feedback ────────────────────────────── */
+
+.sessie-acties { display: flex; justify-content: flex-end; }
+
+.btn-opslaan {
+  padding: 0.6rem 1.3rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-opslaan:active { transform: scale(0.97); opacity: 0.85; }
+
+.sessie-feedback {
+  min-height: 1.2rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+}
+
+.sessie-feedback.succes { background: #eafaf1; color: #1e8449; }
+.sessie-feedback.fout   { background: #fef5e7; color: var(--accent); }
+
+/* ─── Voortgang knoppen (in techniek-kaarten) ────────────── */
+
+.niveau-knoppen {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.niveau-btn {
+  padding: 0.3rem 0.65rem;
+  border: 1.5px solid var(--border);
+  border-radius: 99px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.niveau-btn:active { transform: scale(0.95); }
+
+.niveau-btn.actief.niveau-beginner  { background: #fef9c3; border-color: #f59e0b; color: #92400e; font-weight: 700; }
+.niveau-btn.actief.niveau-gevorderd { background: #fff0e0; border-color: #f97316; color: #7c2d12; font-weight: 700; }
+.niveau-btn.actief.niveau-beheerst  { background: #d1fae5; border-color: #10b981; color: #065f46; font-weight: 700; }
+
+/* ─── Niveau badges ──────────────────────────────────────── */
+
+.niveau-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.12rem 0.45rem;
+  border-radius: 99px;
+}
+
+.niveau-badge.niveau-beginner  { background: #fef9c3; color: #92400e; }
+.niveau-badge.niveau-gevorderd { background: #fff0e0; color: #7c2d12; }
+.niveau-badge.niveau-beheerst  { background: #d1fae5; color: #065f46; }
+
+/* ─── Sessie-history per techniek ────────────────────────── */
+
+.techniek-history {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.techniek-history li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.history-datum { color: var(--muted); font-size: 0.78rem; }
+
+/* ─── Overzicht: sessiekaarten ───────────────────────────── */
+
+.sessie-kaart {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--card);
+  margin-bottom: 0.75rem;
+}
+
+.sessie-kaart-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.sessie-datum  { font-weight: 700; font-size: 0.88rem; flex: 1; }
+.sessie-techniek-count { font-size: 0.75rem; color: var(--muted); }
+
+.btn-verwijder-sessie {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.15rem;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-verwijder-sessie:hover { opacity: 1; }
+
+.sessie-techniek-lijst {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sessie-techniek-entry { display: flex; flex-direction: column; gap: 0.15rem; }
+.sessie-techniek-naam  { font-weight: 600; font-size: 0.86rem; }
+.sessie-aantekening    { margin: 0; font-size: 0.82rem; color: var(--muted); line-height: 1.4; }
+
+/* ─── Statistieken ───────────────────────────────────────── */
+
+.stats-samenvatting {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.stat-kaart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.85rem 0.4rem;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.stat-getal { font-size: 1.75rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.stat-label { font-size: 0.7rem; color: var(--muted); text-align: center; margin-top: 0.2rem; }
+
+.niveau-balk-wrapper { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+.niveau-balk-rij     { display: flex; align-items: center; gap: 0.5rem; }
+.niveau-balk-label   { width: 7.5rem; font-size: 0.8rem; white-space: nowrap; color: var(--text); }
+
+.niveau-balk {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.niveau-balk-vulling { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+.niveau-balk-vulling.niveau-beginner  { background: #f59e0b; }
+.niveau-balk-vulling.niveau-gevorderd { background: #f97316; }
+.niveau-balk-vulling.niveau-beheerst  { background: #10b981; }
+
+.niveau-balk-count { width: 1.5rem; text-align: right; font-size: 0.78rem; color: var(--muted); }
+
+.voortgang-lijst { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.voortgang-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.voortgang-naam { font-size: 0.84rem; flex: 1; color: var(--text); }
+
+/* ─── Lege staat ─────────────────────────────────────────── */
+
+.logboek-leeg {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+/* ─── Mobiel ─────────────────────────────────────────────── */
+
+@media (max-width: 400px) {
+  .logboek-tab  { font-size: 0.76rem; padding: 0.45rem 0.6rem; }
+  .stat-getal   { font-size: 1.4rem; }
+  .niveau-balk-label { width: 6rem; font-size: 0.74rem; }
+  .tabs         { gap: 6px; }
+  .tab          { padding: 10px 14px; font-size: 14px; }
 }

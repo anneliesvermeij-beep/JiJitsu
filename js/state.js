@@ -1,6 +1,9 @@
+// js/state.js
+
 let state = {
   currentTab: "ground",
   selectedPosition: null,
+  logTab: "nieuw",
   theme: localStorage.getItem("theme") || "light"
 };
 
