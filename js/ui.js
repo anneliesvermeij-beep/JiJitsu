@@ -65,7 +65,7 @@ function renderGroundTab(state) {
 
   if (!state.selectedPosition) {
     // Level 1 — position list
-    html += `<h2 class="section-heading">Grondposities</h2>`;
+    html += `<h2 class="section-heading">Grondposities</h2><div class="positions-grid">`;
     groundPositions.forEach(pos => {
       html += `
         <div class="position-card pos-card" onclick="window.showPositionDetail('${pos.id}')">
@@ -79,22 +79,25 @@ function renderGroundTab(state) {
           <div class="pos-card-body">
             <h3 class="pos-name">${pos.name}</h3>
             <div class="pos-japanese">${pos.japanese}</div>
-            <div class="tips-sectie">
-              <div class="tips-rol-label tori-label">Tori</div>
-              <ul class="tips-list">
-                ${pos.tips.tori.map(t => `<li>${t}</li>`).join('')}
-              </ul>
-            </div>
-            <div class="tips-sectie">
-              <div class="tips-rol-label uki-label">Uki</div>
-              <ul class="tips-list">
-                ${pos.tips.uki.map(t => `<li>${t}</li>`).join('')}
-              </ul>
+            <div class="tips-wrapper">
+              <div class="tips-sectie">
+                <div class="tips-rol-label tori-label">Tori</div>
+                <ul class="tips-list">
+                  ${pos.tips.tori.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+              </div>
+              <div class="tips-sectie">
+                <div class="tips-rol-label uki-label">Uki</div>
+                <ul class="tips-list">
+                  ${pos.tips.uki.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       `;
     });
+    html += `</div>`;
   } else {
     // Level 2 — submissions for selected position
     const pos = groundPositions.find(p => p.id === state.selectedPosition);
@@ -127,17 +130,19 @@ function renderGroundTab(state) {
           <div class="sub-card-body">
             <h3 class="sub-name">${sub.name}</h3>
 
-            <div class="tips-sectie">
-              <div class="tips-rol-label tori-label">Tori</div>
-              <ul class="tips-list">
-                ${sub.tips.tori.map(t => `<li>${t}</li>`).join('')}
-              </ul>
-            </div>
-            <div class="tips-sectie">
-              <div class="tips-rol-label uki-label">Uki</div>
-              <ul class="tips-list">
-                ${sub.tips.uki.map(t => `<li>${t}</li>`).join('')}
-              </ul>
+            <div class="tips-wrapper">
+              <div class="tips-sectie">
+                <div class="tips-rol-label tori-label">Tori</div>
+                <ul class="tips-list">
+                  ${sub.tips.tori.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+              </div>
+              <div class="tips-sectie">
+                <div class="tips-rol-label uki-label">Uki</div>
+                <ul class="tips-list">
+                  ${sub.tips.uki.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+              </div>
             </div>
 
             <div class="sub-defense">
@@ -197,24 +202,25 @@ function renderGroundTab(state) {
   return html;
 }
 
-// ─── Throws tab (unchanged) ───────────────────────────────────────────────────
+// ─── Throws tab ──────────────────────────────────────────────────────────────
 
 function renderThrowsTab() {
-  let html = `<h2>Worpen (4 categorieën)</h2>`;
+  let html = `<h2 class="section-heading">Worpen</h2><div class="throws-grid">`;
 
   Object.keys(throwsData).forEach(category => {
-    html += `<div class="category-title" style="color:#c0392b; border-color:#c0392b;">${category}</div>`;
+    html += `<div class="throw-category">`;
+    html += `<div class="throw-category-header">${category}</div>`;
     throwsData[category].forEach(t => {
       const progress = getProgress(t.name);
       html += `
-        <div class="submission">
-          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
-            <h4 style="margin:0 0 6px;">${t.name}</h4>
+        <div class="throw-item">
+          <div class="throw-item-header">
+            <h4 class="throw-naam">${t.name}</h4>
             ${progress ? `<span class="niveau-badge niveau-${progress}">${NIVEAU_ICONS[progress]} ${NIVEAU_LABELS[progress]}</span>` : ''}
           </div>
-          <div style="font-size:14px;">${t.description}</div>
-          <div style="font-size:13px; color:#666; margin:6px 0;"><strong>Kuzushi:</strong> ${t.kuzushi}</div>
-          <a href="${t.link}" target="_blank" class="youtube-link">▶ Video voorbeeld</a>
+          <div class="throw-beschrijving">${t.description}</div>
+          <div class="throw-kuzushi"><strong>Kuzushi:</strong> ${t.kuzushi}</div>
+          <a href="${t.link}" target="_blank" class="youtube-link">▶ Video</a>
           <div class="niveau-knoppen" style="margin-top:10px;">
             ${NIVEAUS.map(n => `
               <button
@@ -228,8 +234,10 @@ function renderThrowsTab() {
         </div>
       `;
     });
+    html += `</div>`;
   });
 
+  html += `</div>`;
   return html;
 }
 
@@ -306,7 +314,7 @@ function renderOverzicht() {
     return `<div class="logboek-leeg"><p>Nog geen sessies gelogd.</p><p>Ga naar <strong>Nieuw loggen</strong> om je eerste les bij te houden.</p></div>`;
   }
 
-  let html = `<h2 class="logboek-titel">Alle trainingen</h2>`;
+  let html = `<h2 class="logboek-titel">Alle trainingen</h2><div class="sessies-grid">`;
 
   sessies.forEach(sessie => {
     html += `
@@ -328,6 +336,7 @@ function renderOverzicht() {
       </div>
     `;
   });
+  html += `</div>`;
 
   return html;
 }

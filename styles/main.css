@@ -711,3 +711,139 @@ body {
   .sub-name      { font-size: 0.97rem; }
   .tips-list li  { font-size: 0.82rem; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   LAYOUT — OVERZICHT VERBETERINGEN
+   ══════════════════════════════════════════════════════════ */
+
+/* ─── Grondposities: 2-koloms grid ──────────────────────── */
+
+.positions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* ─── Tori / Uki tips naast elkaar ──────────────────────── */
+
+.tips-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.tips-wrapper .tips-sectie {
+  margin-bottom: 0;
+}
+
+/* ─── Submission-kaart: thumbnail links, inhoud rechts ───── */
+
+@media (min-width: 700px) {
+  .sub-card {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .sub-thumbnail-link {
+    flex: 0 0 260px;
+  }
+  .sub-thumbnail {
+    width: 260px;
+    height: 100%;
+    aspect-ratio: unset;
+    border-radius: 10px 0 0 10px;
+  }
+  .sub-card-body {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ─── Worpen: 2-koloms grid per categorie ────────────────── */
+
+.throws-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.throw-category {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.throw-category-header {
+  padding: 12px 16px;
+  background: var(--header-bg);
+  border-bottom: 2px solid var(--accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.throw-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.throw-item:last-child {
+  border-bottom: none;
+}
+
+.throw-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.throw-naam {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.throw-beschrijving {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.throw-kuzushi {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 4px 0 8px;
+}
+
+/* ─── Overzicht: sessiekaarten in grid ───────────────────── */
+
+@media (min-width: 700px) {
+  .sessies-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    align-items: start;
+  }
+  .sessies-grid .sessie-kaart {
+    margin-bottom: 0;
+  }
+}
+
+/* ─── Responsief ─────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .positions-grid { grid-template-columns: 1fr; }
+  .throws-grid    { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 500px) {
+  .tips-wrapper { grid-template-columns: 1fr; }
+}
