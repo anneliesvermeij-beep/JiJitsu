@@ -65,7 +65,7 @@ function renderGroundTab(state) {
 
   if (!state.selectedPosition) {
     // Level 1 — position list
-    html += `<h2 class="section-heading">Ground Positions</h2>`;
+    html += `<h2 class="section-heading">Grondposities</h2>`;
     groundPositions.forEach(pos => {
       html += `
         <div class="position-card pos-card" onclick="window.showPositionDetail('${pos.id}')">
@@ -79,9 +79,18 @@ function renderGroundTab(state) {
           <div class="pos-card-body">
             <h3 class="pos-name">${pos.name}</h3>
             <div class="pos-japanese">${pos.japanese}</div>
-            <ul class="tips-list">
-              ${pos.tips.map(t => `<li>${t}</li>`).join('')}
-            </ul>
+            <div class="tips-sectie">
+              <div class="tips-rol-label tori-label">Tori</div>
+              <ul class="tips-list">
+                ${pos.tips.tori.map(t => `<li>${t}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="tips-sectie">
+              <div class="tips-rol-label uki-label">Uki</div>
+              <ul class="tips-list">
+                ${pos.tips.uki.map(t => `<li>${t}</li>`).join('')}
+              </ul>
+            </div>
           </div>
         </div>
       `;
@@ -90,7 +99,7 @@ function renderGroundTab(state) {
     // Level 2 — submissions for selected position
     const pos = groundPositions.find(p => p.id === state.selectedPosition);
     html += `
-      <button class="back-btn" onclick="window.backToList()">← Back</button>
+      <button class="back-btn" onclick="window.backToList()">← Terug</button>
       <h2 class="section-heading">
         ${pos.name}
         <span class="pos-japanese-inline">${pos.japanese}</span>
@@ -118,18 +127,27 @@ function renderGroundTab(state) {
           <div class="sub-card-body">
             <h3 class="sub-name">${sub.name}</h3>
 
-            <ul class="tips-list">
-              ${sub.tips.map(t => `<li>${t}</li>`).join('')}
-            </ul>
-
-            <div class="sub-defense">
-              <span class="sub-defense-label">Defense:</span> ${sub.defense}
+            <div class="tips-sectie">
+              <div class="tips-rol-label tori-label">Tori</div>
+              <ul class="tips-list">
+                ${sub.tips.tori.map(t => `<li>${t}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="tips-sectie">
+              <div class="tips-rol-label uki-label">Uki</div>
+              <ul class="tips-list">
+                ${sub.tips.uki.map(t => `<li>${t}</li>`).join('')}
+              </ul>
             </div>
 
-            <a href="${sub.link}" target="_blank" class="youtube-link">▶ Watch video</a>
+            <div class="sub-defense">
+              <span class="sub-defense-label">Verdediging:</span> ${sub.defense}
+            </div>
+
+            <a href="${sub.link}" target="_blank" class="youtube-link">▶ Bekijk video</a>
 
             <div class="log-section" style="margin-top:12px;">
-              <div class="log-label">📈 Progress</div>
+              <div class="log-label">📈 Voortgang</div>
               <div class="niveau-knoppen">
                 ${NIVEAUS.map(n => `
                   <button
@@ -143,23 +161,23 @@ function renderGroundTab(state) {
             </div>
 
             <div class="log-section">
-              <div class="log-label">📝 My notes</div>
+              <div class="log-label">📝 Mijn notities</div>
               <textarea
                 id="note-${index}"
                 class="log-textarea"
-                placeholder="Write your notes here..."
+                placeholder="Schrijf hier je notities..."
               >${saved ? saved.note : ''}</textarea>
               <div class="log-footer">
                 <span class="log-date">
-                  ${saved ? `Last saved: ${saved.date}` : 'No notes yet'}
+                  ${saved ? `Opgeslagen: ${saved.date}` : 'Nog geen notities'}
                 </span>
-                <button class="log-save-btn" onclick="window.saveLog('${sub.name}', ${index})">Save</button>
+                <button class="log-save-btn" onclick="window.saveLog('${sub.name}', ${index})">Opslaan</button>
               </div>
             </div>
 
             ${history.length > 0 ? `
               <div class="log-section">
-                <div class="log-label">🗓 Practiced before</div>
+                <div class="log-label">🗓 Eerder geoefend</div>
                 <ul class="techniek-history">
                   ${history.map(h => `
                     <li>
@@ -399,9 +417,9 @@ window.saveLog = function(name, index) {
   if (!textarea) return;
   saveNote(name, textarea.value);
   const btn = textarea.parentElement.querySelector('.log-save-btn');
-  btn.textContent = '✓ Saved';
+  btn.textContent = '✓ Opgeslagen';
   btn.style.background = 'var(--success)';
-  setTimeout(() => { btn.textContent = 'Save'; btn.style.background = ''; }, 2000);
+  setTimeout(() => { btn.textContent = 'Opslaan'; btn.style.background = ''; }, 2000);
 };
 
 window.setProgress = function(naam, niveau, btn) {
