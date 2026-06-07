@@ -599,6 +599,31 @@ body {
 
 /* ── Tips bullet list ────────────────────────────────────── */
 
+.tips-sectie {
+  margin-bottom: 10px;
+}
+
+.tips-rol-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.tori-label {
+  background: #c0392b22;
+  color: #c0392b;
+}
+
+.uki-label {
+  background: #2980b922;
+  color: #2980b9;
+}
+
 .tips-list {
   margin: 0;
   padding-left: 1.2rem;
