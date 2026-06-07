@@ -244,7 +244,7 @@ export const groundPositions = [
     name: "Back Mount",
     japanese: "Ushiro-kesa-gatame",
     color: "#e67e22",
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Fm3-25-150combativesfig3-1backmount.png",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Back_mount.jpg",
     tips: {
       tori: [
         "Houd je hooks in en kruis je voeten onder de dijen van uki",
