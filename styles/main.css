@@ -837,6 +837,24 @@ body {
   }
 }
 
+/* ─── Worp-kaarten (zelfde look als pos-card) ───────────────*/
+
+.worp-kaart {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.worp-naam-rij {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
 /* ─── Responsief ─────────────────────────────────────────── */
 
 @media (max-width: 640px) {
