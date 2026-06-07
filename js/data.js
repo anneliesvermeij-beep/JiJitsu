@@ -114,7 +114,7 @@ export const groundPositions = [
     name: "Guard",
     japanese: "Do-osae",
     color: "#2980b9",
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Guard-grappling-position.jpg",
+    photo: "images/guard.png",
     tips: {
       tori: [
         "Breek de houding van uki voor je een submission probeert",
