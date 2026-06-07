@@ -54,22 +54,25 @@ export function loadAllProgress() {
 }
 
 // ─── Trainingssessies ────────────────────────────────────────────────────────
-// Sessie: { id, datum, technieken: [{ naam, aantekening, niveau }] }
+// Sessie: { id, datum, gym?, duration?, note?, sparring?, technieken: [{naam, aantekening, niveau}] }
 
-export function saveSession(datum, technieken) {
+export function saveSession(datum, technieken, extra = {}) {
   const sessies = loadAllSessions();
   const sessie = {
     id: Date.now().toString(),
     datum,
-    technieken: technieken.filter(t => t.aantekening.trim() || t.niveau),
+    ...(extra.gym      && { gym: extra.gym }),
+    ...(extra.duration && { duration: parseInt(extra.duration) }),
+    ...(extra.note     && { note: extra.note }),
+    ...(extra.sparring?.mood && { sparring: extra.sparring }),
+    technieken: technieken.filter(t => t.naam),
   };
   sessies.push(sessie);
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessies));
 
-  // Voortgang & aantekening per techniek ook bijwerken
   sessie.technieken.forEach(t => {
-    if (t.niveau) saveProgress(t.naam, t.niveau);
-    if (t.aantekening.trim()) saveNote(t.naam, t.aantekening);
+    if (t.niveau)           saveProgress(t.naam, t.niveau);
+    if (t.aantekening?.trim()) saveNote(t.naam, t.aantekening);
   });
 
   return sessie;

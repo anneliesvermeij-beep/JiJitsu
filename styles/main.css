@@ -950,3 +950,332 @@ body {
 @media (max-width: 500px) {
   .overzicht-cat-naam { flex: 0 0 72px; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   LOG WIZARD
+   ══════════════════════════════════════════════════════════ */
+
+.wizard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ─── Progress dots ──────────────────────────────────────── */
+
+.wizard-progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 0.2rem 0;
+}
+
+.wizard-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.25s ease;
+}
+
+.wizard-dot.actief {
+  background: var(--accent);
+  width: 22px;
+  border-radius: 4px;
+}
+
+.wizard-dot.gedaan {
+  background: var(--success);
+}
+
+/* ─── Titles & hints ─────────────────────────────────────── */
+
+.wizard-titel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.wizard-optioneel {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.wizard-hint {
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.wizard-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* ─── Positie selectie ───────────────────────────────────── */
+
+.positie-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.positie-knop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 1rem 0.4rem;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.positie-knop:active { transform: scale(0.95); }
+
+.positie-knop.geselecteerd {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.positie-icon  { font-size: 1.5rem; line-height: 1; }
+.positie-label { font-size: 0.75rem; font-weight: 600; text-align: center; }
+
+/* ─── Techniek checkboxes ────────────────────────────────── */
+
+.techniek-groep {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.techniek-groep-header {
+  padding: 7px 14px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.techniek-checkboxes {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  gap: 2px;
+}
+
+.techniek-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.techniek-check.geselecteerd {
+  background: var(--header-bg);
+}
+
+.techniek-checkbox-input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ─── Sparring feedback ──────────────────────────────────── */
+
+.mood-knoppen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mood-knop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 1rem 0.4rem;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mood-knop:active { transform: scale(0.95); }
+
+.mood-knop.geselecteerd {
+  border-color: var(--accent);
+  background: var(--header-bg);
+}
+
+.mood-icon  { font-size: 2rem; line-height: 1; }
+.mood-label { font-size: 0.8rem; font-weight: 600; }
+
+.tag-knoppen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0.5rem;
+}
+
+.tag-knop {
+  padding: 0.4rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 99px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tag-knop:active { transform: scale(0.95); }
+
+.tag-knop.geselecteerd {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ─── Wizard navigation buttons ──────────────────────────── */
+
+.wizard-acties {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+}
+
+.wizard-acties-center {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.wizard-volgende {
+  padding: 0.65rem 1.3rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wizard-volgende:active { transform: scale(0.97); }
+.wizard-volgende.disabled,
+.wizard-volgende:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.wizard-terug {
+  padding: 0.65rem 1.1rem;
+  background: none;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.wizard-opslaan {
+  padding: 0.65rem 1.3rem;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wizard-opslaan:active { transform: scale(0.97); }
+
+/* ─── Bevestiging ────────────────────────────────────────── */
+
+.wizard-bevestiging {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  padding: 0.75rem 0 0.5rem;
+}
+
+.bevestiging-check { font-size: 3.5rem; line-height: 1; margin-bottom: 0.25rem; }
+.wizard-bevestiging .wizard-titel { font-size: 1.2rem; }
+.bevestiging-meta  { color: var(--muted); font-size: 0.88rem; margin: 0; }
+.bevestiging-sub   { color: var(--muted); font-size: 0.82rem; margin: 0; }
+
+/* ─── Overzicht: sessie extra info ───────────────────────── */
+
+.sessie-meta-chip {
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 0.1rem 0.5rem;
+}
+
+.sessie-note {
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+  border-bottom: 1px solid var(--border);
+}
+
+.sessie-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sessie-tag {
+  font-size: 0.72rem;
+  background: var(--header-bg);
+  border-radius: 99px;
+  padding: 0.1rem 0.5rem;
+  color: var(--muted);
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 400px) {
+  .positie-grid  { grid-template-columns: repeat(2, 1fr); }
+  .mood-knoppen  { gap: 8px; }
+  .wizard-volgende, .wizard-terug, .wizard-opslaan { font-size: 0.85rem; padding: 0.6rem 1rem; }
+}
