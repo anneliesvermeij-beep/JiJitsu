@@ -7,12 +7,16 @@ import { getNote, saveNote, getProgress, saveProgress, saveSession,
          getStats, NIVEAUS, NIVEAU_LABELS, NIVEAU_ICONS } from './log.js';
 
 function getAllTechnieken() {
+  return getAllTechniekMetCategorie().map(t => t.naam);
+}
+
+function getAllTechniekMetCategorie() {
   const uit = [];
   groundPositions.forEach(pos =>
-    pos.submissions.forEach(sub => uit.push(sub.name))
+    pos.submissions.forEach(sub => uit.push({ naam: sub.name, categorie: pos.name }))
   );
-  Object.values(throwsData).forEach(cat =>
-    cat.forEach(t => uit.push(t.name))
+  Object.entries(throwsData).forEach(([cat, worpen]) =>
+    worpen.forEach(t => uit.push({ naam: t.name, categorie: cat }))
   );
   return uit;
 }
@@ -265,6 +269,8 @@ function renderLogboekTab(state) {
     </div>
   `;
 
+  html += renderTechniekOverzicht();
+
   if (logTab === 'nieuw')     html += renderNieuwSessieForm();
   if (logTab === 'overzicht') html += renderOverzicht();
   if (logTab === 'stats')     html += renderStats();
@@ -272,13 +278,45 @@ function renderLogboekTab(state) {
   return html;
 }
 
+function renderTechniekOverzicht() {
+  const catChips = [
+    ...groundPositions.map(p => ({ label: p.name, items: p.submissions.map(s => s.name) })),
+    ...Object.entries(throwsData).map(([cat, worpen]) => ({ label: cat, items: worpen.map(w => w.name) }))
+  ];
+
+  let html = `<div class="techniek-overzicht">
+    <div class="overzicht-header">Alle technieken</div>
+  `;
+  catChips.forEach(({ label, items }) => {
+    html += `
+      <div class="overzicht-rij">
+        <span class="overzicht-cat-naam">${label}</span>
+        <span class="overzicht-cat-items">${items.join(' · ')}</span>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  return html;
+}
+
 function renderNieuwSessieForm() {
   const vandaag = new Date().toISOString().split('T')[0];
-  const alleTechnieken = getAllTechnieken();
+  const alleTechnieken = getAllTechniekMetCategorie();
+  const categories = ['Alles', ...groundPositions.map(p => p.name), ...Object.keys(throwsData)];
 
   let html = `
     <div class="sessie-form">
       <h2 class="logboek-titel">Nieuwe trainingssessie</h2>
+
+      <div class="categorie-filter" id="categorie-filter">
+        ${categories.map(c => `
+          <button class="categorie-filter-btn${c === 'Alles' ? ' actief' : ''}"
+                  data-cat="${c}"
+                  onclick="window.filterCategorie('${c}')">
+            ${c}
+          </button>
+        `).join('')}
+      </div>
 
       <div class="form-veld">
         <label for="sessie-datum">Datum</label>
@@ -291,12 +329,12 @@ function renderNieuwSessieForm() {
       </div>
 
       <div class="technieken-selectie" id="technieken-selectie">
-        ${alleTechnieken.map((naam, i) => {
-          const progress = getProgress(naam);
+        ${alleTechnieken.map((t, i) => {
+          const progress = getProgress(t.naam);
           return `
-            <div class="techniek-log-item" data-naam="${naam.toLowerCase()}" data-index="${i}">
+            <div class="techniek-log-item" data-naam="${t.naam.toLowerCase()}" data-categorie="${t.categorie}" data-index="${i}">
               <div class="techniek-log-header">
-                <span class="techniek-log-naam">${naam}</span>
+                <span class="techniek-log-naam">${t.naam}</span>
                 <select class="niveau-select" id="niveau-${i}">
                   <option value="">— niveau —</option>
                   ${NIVEAUS.map(n => `<option value="${n}" ${progress === n ? 'selected' : ''}>${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}</option>`).join('')}
@@ -451,23 +489,39 @@ window.setProgress = function(naam, niveau, btn) {
   });
 };
 
+window.filterCategorie = function(cat) {
+  document.querySelectorAll('.categorie-filter-btn').forEach(b => {
+    b.classList.toggle('actief', b.dataset.cat === cat);
+  });
+  const search = (document.getElementById('techniek-zoek')?.value || '').toLowerCase();
+  document.querySelectorAll('.techniek-log-item').forEach(item => {
+    const matchCat    = cat === 'Alles' || item.dataset.categorie === cat;
+    const matchSearch = !search || item.dataset.naam.includes(search);
+    item.style.display = (matchCat && matchSearch) ? '' : 'none';
+  });
+};
+
 window.filterTechnieken = function(query) {
-  const items = document.querySelectorAll('.techniek-log-item');
-  items.forEach(item => {
-    item.style.display = item.dataset.naam.includes(query.toLowerCase()) ? '' : 'none';
+  const activeCatBtn = document.querySelector('.categorie-filter-btn.actief');
+  const cat   = activeCatBtn?.dataset.cat || 'Alles';
+  const search = query.toLowerCase();
+  document.querySelectorAll('.techniek-log-item').forEach(item => {
+    const matchCat    = cat === 'Alles' || item.dataset.categorie === cat;
+    const matchSearch = !search || item.dataset.naam.includes(search);
+    item.style.display = (matchCat && matchSearch) ? '' : 'none';
   });
 };
 
 window.slaSessionOp = function() {
   const datum = document.getElementById('sessie-datum')?.value;
-  const alleTechnieken = getAllTechnieken();
+  const alleTechnieken = getAllTechniekMetCategorie();
   const technieken = [];
 
-  alleTechnieken.forEach((naam, i) => {
+  alleTechnieken.forEach((t, i) => {
     const aantekening = document.getElementById(`sessie-note-${i}`)?.value?.trim() || '';
     const niveau      = document.getElementById(`niveau-${i}`)?.value || '';
     if (aantekening || niveau) {
-      technieken.push({ naam, aantekening, niveau });
+      technieken.push({ naam: t.naam, aantekening, niveau });
     }
   });
 
