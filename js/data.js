@@ -440,23 +440,23 @@ export const groundPositions = [
 
 export const throwsData = {
   "Armworpen": [
-    { name: "Seoi Nage", description: "Schouderworp met één of twee armen", kuzushi: "Trek naar voren en naar beneden", link: "https://www.youtube.com/watch?v=5shl7rRm7i4" },
-    { name: "Ippon Seoi Nage", description: "Schouderworp met één arm", kuzushi: "Trek arm naar voren, breek balans", link: "https://www.youtube.com/watch?v=5shl7rRm7i4" },
-    { name: "Tai Otoshi", description: "Lichaamsdrop — blokkeer been en trek erover", kuzushi: "Sterke trek naar voren en rechts", link: "https://www.youtube.com/watch?v=AEwEKUtYHXI" }
+    { name: "Seoi Nage", description: "Schouderworp met één of twee armen", kuzushi: "Trek naar voren en naar beneden", link: "https://www.youtube.com/watch?v=zIq0xI0ogxk" },
+    { name: "Ippon Seoi Nage", description: "Schouderworp met één arm", kuzushi: "Trek arm naar voren, breek balans", link: "https://www.youtube.com/watch?v=FQnOlCxo4oI" },
+    { name: "Tai Otoshi", description: "Lichaamsdrop — blokkeer been en trek erover", kuzushi: "Sterke trek naar voren en rechts", link: "https://www.youtube.com/watch?v=4x6S3Q-Ktv8" }
   ],
   "Heupworpen": [
-    { name: "O Goshi", description: "Grote heupdraai", kuzushi: "Trek naar voren, plant heup diep", link: "https://www.youtube.com/watch?v=waxH8FA28IA" },
-    { name: "Harai Goshi", description: "Vegende heupdraai", kuzushi: "Trek naar voren en veeg been weg", link: "https://www.youtube.com/watch?v=jNqVF4PTwVg" },
-    { name: "Uchi Mata", description: "Binnendijworp", kuzushi: "Trek naar voren en veeg omhoog", link: "https://www.youtube.com/watch?v=Jk1TC6xvE9Y" }
+    { name: "O Goshi", description: "Grote heupdraai", kuzushi: "Trek naar voren, plant heup diep", link: "https://www.youtube.com/watch?v=yhu1mfy2vJ4" },
+    { name: "Harai Goshi", description: "Vegende heupdraai", kuzushi: "Trek naar voren en veeg been weg", link: "https://www.youtube.com/watch?v=qTo8HlAAkOo" },
+    { name: "Uchi Mata", description: "Binnendijworp", kuzushi: "Trek naar voren en veeg omhoog", link: "https://www.youtube.com/watch?v=iUpSu5J-bgw" }
   ],
   "Beenworpen": [
-    { name: "Osoto Gari", description: "Grote buitenmaai", kuzushi: "Trek naar achteren en opzij", link: "https://www.youtube.com/watch?v=5shl7rRm7i4" },
-    { name: "Ouchi Gari", description: "Grote binnenmaai", kuzushi: "Duw naar achteren richting hielen", link: "https://www.youtube.com/watch?v=AEwEKUtYHXI" },
-    { name: "Kouchi Gari", description: "Kleine binnenmaai", kuzushi: "Lichte duw naar achteren", link: "https://www.youtube.com/watch?v=AEwEKUtYHXI" }
+    { name: "Osoto Gari", description: "Grote buitenmaai", kuzushi: "Trek naar achteren en opzij", link: "https://www.youtube.com/watch?v=c-A_nP7mKAc" },
+    { name: "Ouchi Gari", description: "Grote binnenmaai", kuzushi: "Duw naar achteren richting hielen", link: "https://www.youtube.com/watch?v=0itJFhV9pDQ" },
+    { name: "Kouchi Gari", description: "Kleine binnenmaai", kuzushi: "Lichte duw naar achteren", link: "https://www.youtube.com/watch?v=3Jb3tZvr9Ng" }
   ],
   "Schouderworpen": [
-    { name: "Koshi Guruma", description: "Heupwiel worp", kuzushi: "Trek hoofd naar voren en naar beneden", link: "https://www.youtube.com/watch?v=k1EGubrfzNg" },
-    { name: "Kata Guruma", description: "Schouderwiel", kuzushi: "Trek arm en zak op knieën", link: "https://www.youtube.com/watch?v=AEwEKUtYHXI" },
-    { name: "Morote Seoi Nage", description: "Schouderworp met twee armen", kuzushi: "Trek sterk naar voren en naar beneden", link: "https://www.youtube.com/watch?v=5shl7rRm7i4" }
+    { name: "Koshi Guruma", description: "Heupwiel worp", kuzushi: "Trek hoofd naar voren en naar beneden", link: "https://www.youtube.com/watch?v=SU7Id6uVJ44" },
+    { name: "Kata Guruma", description: "Schouderwiel", kuzushi: "Trek arm en zak op knieën", link: "https://www.youtube.com/watch?v=cnHRhSy8yi4" },
+    { name: "Morote Seoi Nage", description: "Schouderworp met twee armen", kuzushi: "Trek sterk naar voren en naar beneden", link: "https://www.youtube.com/watch?v=zIq0xI0ogxk" }
   ]
 };
