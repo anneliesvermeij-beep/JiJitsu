@@ -26,6 +26,32 @@ function getYouTubeId(url) {
   return match ? match[1] : null;
 }
 
+// ─── Wizard constants ─────────────────────────────────────────────────────────
+
+const WIZARD_POSITIES = [
+  { id: 'guard',        label: 'Guard',        icon: '🛡️' },
+  { id: 'half-guard',   label: 'Half Guard',   icon: '⚔️' },
+  { id: 'side-control', label: 'Side Control', icon: '↔️' },
+  { id: 'mount',        label: 'Mount',        icon: '⬆️' },
+  { id: 'back-mount',   label: 'Back Mount',   icon: '🔄' },
+  { id: 'worpen',       label: 'Worpen',       icon: '🌀' },
+];
+
+const SPARRING_MOODS = [
+  { id: 'good',    label: 'Goed',   icon: '😊' },
+  { id: 'average', label: 'Oké',    icon: '😐' },
+  { id: 'bad',     label: 'Zwaar',  icon: '😤' },
+];
+
+const SPARRING_TAGS = [
+  { id: 'submitted_someone', label: 'Iemand getapt' },
+  { id: 'got_submitted',     label: 'Zelf getapt'   },
+  { id: 'escaped_well',      label: 'Goed ontsnapt' },
+  { id: 'struggled',         label: 'Geworsteld'    },
+];
+
+const WIZARD_STAPPEN = 5;
+
 // ─── Main render ─────────────────────────────────────────────────────────────
 
 export function renderApp() {
@@ -68,7 +94,6 @@ function renderGroundTab(state) {
   let html = "";
 
   if (!state.selectedPosition) {
-    // Level 1 — position list
     html += `<h2 class="section-heading">Grondposities</h2><div class="positions-grid">`;
     groundPositions.forEach(pos => {
       html += `
@@ -103,7 +128,6 @@ function renderGroundTab(state) {
     });
     html += `</div>`;
   } else {
-    // Level 2 — submissions for selected position
     const pos = groundPositions.find(p => p.id === state.selectedPosition);
     html += `
       <button class="back-btn" onclick="window.backToList()">← Terug</button>
@@ -114,7 +138,7 @@ function renderGroundTab(state) {
     `;
 
     pos.submissions.forEach((sub, index) => {
-      const saved   = getNote(sub.name);
+      const saved    = getNote(sub.name);
       const progress = getProgress(sub.name);
       const history  = getSessionsForTechnique(sub.name);
       const videoId  = getYouTubeId(sub.link);
@@ -186,7 +210,7 @@ function renderGroundTab(state) {
 
             ${history.length > 0 ? `
               <div class="log-section">
-                <div class="log-label">🗓 Eerder geoefend</div>
+                <div class="log-label">🗓 Eerder geoefend (${history.length}×)</div>
                 <ul class="techniek-history">
                   ${history.map(h => `
                     <li>
@@ -256,27 +280,29 @@ function renderThrowsTab() {
   return html;
 }
 
-// ─── Logboek tab (unchanged) ──────────────────────────────────────────────────
+// ─── Logboek tab ─────────────────────────────────────────────────────────────
 
 function renderLogboekTab(state) {
   const logTab = state.logTab || 'nieuw';
 
   let html = `
     <div class="logboek-tabs">
-      <button class="logboek-tab ${logTab === 'nieuw'     ? 'active' : ''}" onclick="window.switchLogTab('nieuw')">➕ Nieuw loggen</button>
+      <button class="logboek-tab ${logTab === 'nieuw'     ? 'active' : ''}" onclick="window.switchLogTab('nieuw')">⚡ Loggen</button>
       <button class="logboek-tab ${logTab === 'overzicht' ? 'active' : ''}" onclick="window.switchLogTab('overzicht')">📋 Overzicht</button>
       <button class="logboek-tab ${logTab === 'stats'     ? 'active' : ''}" onclick="window.switchLogTab('stats')">📊 Voortgang</button>
     </div>
   `;
 
-  html += renderTechniekOverzicht();
+  if (logTab !== 'nieuw') html += renderTechniekOverzicht();
 
-  if (logTab === 'nieuw')     html += renderNieuwSessieForm();
+  if (logTab === 'nieuw')     html += renderLogWizard(state);
   if (logTab === 'overzicht') html += renderOverzicht();
   if (logTab === 'stats')     html += renderStats();
 
   return html;
 }
+
+// ─── Techniek overzicht (reference card) ─────────────────────────────────────
 
 function renderTechniekOverzicht() {
   const catChips = [
@@ -284,9 +310,7 @@ function renderTechniekOverzicht() {
     ...Object.entries(throwsData).map(([cat, worpen]) => ({ label: cat, items: worpen.map(w => w.name) }))
   ];
 
-  let html = `<div class="techniek-overzicht">
-    <div class="overzicht-header">Alle technieken</div>
-  `;
+  let html = `<div class="techniek-overzicht"><div class="overzicht-header">Alle technieken</div>`;
   catChips.forEach(({ label, items }) => {
     html += `
       <div class="overzicht-rij">
@@ -299,80 +323,270 @@ function renderTechniekOverzicht() {
   return html;
 }
 
-function renderNieuwSessieForm() {
-  const vandaag = new Date().toISOString().split('T')[0];
-  const alleTechnieken = getAllTechniekMetCategorie();
-  const categories = ['Alles', ...groundPositions.map(p => p.name), ...Object.keys(throwsData)];
+// ─── Log wizard ───────────────────────────────────────────────────────────────
 
-  let html = `
-    <div class="sessie-form">
-      <h2 class="logboek-titel">Nieuwe trainingssessie</h2>
+function initWizardData() {
+  return {
+    datum: new Date().toISOString().split('T')[0],
+    gym: '',
+    duration: '',
+    selectedPositions: [],
+    selectedTechnieken: [],
+    sparring: { mood: null, tags: [] },
+    note: ''
+  };
+}
 
-      <div class="categorie-filter" id="categorie-filter">
-        ${categories.map(c => `
-          <button class="categorie-filter-btn${c === 'Alles' ? ' actief' : ''}"
-                  data-cat="${c}"
-                  onclick="window.filterCategorie('${c}')">
-            ${c}
-          </button>
+function collectWizardStapData(step) {
+  const current = getState().wizardData || initWizardData();
+  if (step === 1) {
+    return {
+      ...current,
+      datum:    document.getElementById('w-datum')?.value    || current.datum,
+      gym:      document.getElementById('w-gym')?.value.trim()   || '',
+      duration: document.getElementById('w-duration')?.value || ''
+    };
+  }
+  if (step === 4) {
+    return { ...current, note: document.getElementById('w-note')?.value.trim() || '' };
+  }
+  return current;
+}
+
+function getTechniekVoorPositie(positieId) {
+  if (positieId === 'worpen') return null; // handled separately
+  const pos = groundPositions.find(p => p.id === positieId);
+  return pos ? pos.submissions.map(s => s.name) : [];
+}
+
+function renderTechniekGroep(label, namen, selected) {
+  return `
+    <div class="techniek-groep">
+      <div class="techniek-groep-header">${label}</div>
+      <div class="techniek-checkboxes">
+        ${namen.map(naam => `
+          <label class="techniek-check ${selected.includes(naam) ? 'geselecteerd' : ''}">
+            <input
+              type="checkbox"
+              class="techniek-checkbox-input"
+              data-naam="${naam}"
+              ${selected.includes(naam) ? 'checked' : ''}
+              onchange="window.wizardToggleTechniek('${naam.replace(/'/g, "\\'")}', this.checked)">
+            <span>${naam}</span>
+          </label>
         `).join('')}
       </div>
-
-      <div class="form-veld">
-        <label for="sessie-datum">Datum</label>
-        <input type="date" id="sessie-datum" value="${vandaag}" max="${vandaag}">
-      </div>
-
-      <div class="form-veld">
-        <label for="techniek-zoek">Zoek techniek</label>
-        <input type="text" id="techniek-zoek" placeholder="Bijv. armbar, seoi nage..." autocomplete="off" oninput="window.filterTechnieken(this.value)">
-      </div>
-
-      <div class="technieken-selectie" id="technieken-selectie">
-        ${alleTechnieken.map((t, i) => {
-          const progress = getProgress(t.naam);
-          return `
-            <div class="techniek-log-item" data-naam="${t.naam.toLowerCase()}" data-categorie="${t.categorie}" data-index="${i}">
-              <div class="techniek-log-header">
-                <span class="techniek-log-naam">${t.naam}</span>
-                <select class="niveau-select" id="niveau-${i}">
-                  <option value="">— niveau —</option>
-                  ${NIVEAUS.map(n => `<option value="${n}" ${progress === n ? 'selected' : ''}>${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}</option>`).join('')}
-                </select>
-              </div>
-              <textarea class="log-aantekening" id="sessie-note-${i}" placeholder="Aantekening (optioneel)..." rows="2"></textarea>
-            </div>
-          `;
-        }).join('')}
-      </div>
-
-      <div class="sessie-acties">
-        <button class="btn-opslaan" onclick="window.slaSessionOp()">💾 Sessie opslaan</button>
-      </div>
-      <div id="sessie-feedback" class="sessie-feedback"></div>
     </div>
   `;
-
-  return html;
 }
+
+function renderLogWizard(state) {
+  const step = state.logStep || 1;
+  const data = state.wizardData || initWizardData();
+
+  const dots = Array.from({ length: WIZARD_STAPPEN }, (_, i) => `
+    <div class="wizard-dot ${i + 1 === step ? 'actief' : ''} ${i + 1 < step ? 'gedaan' : ''}"></div>
+  `).join('');
+
+  let body = '';
+  if (step === 1) body = renderWizardStap1(data);
+  if (step === 2) body = renderWizardStap2(data);
+  if (step === 3) body = renderWizardStap3(data);
+  if (step === 4) body = renderWizardStap4(data);
+  if (step === 5) body = renderWizardStap5(data);
+
+  return `
+    <div class="wizard-container">
+      <div class="wizard-progress">${dots}</div>
+      ${body}
+    </div>
+  `;
+}
+
+function renderWizardStap1(data) {
+  const vandaag = new Date().toISOString().split('T')[0];
+  return `
+    <h2 class="wizard-titel">Training loggen</h2>
+    <div class="wizard-form">
+      <div class="form-veld">
+        <label for="w-datum">Datum</label>
+        <input type="date" id="w-datum" value="${data.datum || vandaag}" max="${vandaag}">
+      </div>
+      <div class="form-veld">
+        <label for="w-gym">Gym <span class="wizard-optioneel">(optioneel)</span></label>
+        <input type="text" id="w-gym" placeholder="bijv. Novaforce" value="${data.gym || ''}">
+      </div>
+      <div class="form-veld">
+        <label for="w-duration">Duur in minuten <span class="wizard-optioneel">(optioneel)</span></label>
+        <input type="number" id="w-duration" placeholder="90" min="1" max="300" value="${data.duration || ''}">
+      </div>
+    </div>
+    <div class="wizard-acties">
+      <button class="wizard-volgende" onclick="window.wizardVolgende(1)">Posities kiezen →</button>
+    </div>
+  `;
+}
+
+function renderWizardStap2(data) {
+  return `
+    <h2 class="wizard-titel">Welke posities geoefend?</h2>
+    <div class="positie-grid">
+      ${WIZARD_POSITIES.map(p => `
+        <button
+          class="positie-knop ${data.selectedPositions.includes(p.id) ? 'geselecteerd' : ''}"
+          data-pos="${p.id}"
+          onclick="window.wizardTogglePositie('${p.id}')">
+          <span class="positie-icon">${p.icon}</span>
+          <span class="positie-label">${p.label}</span>
+        </button>
+      `).join('')}
+    </div>
+    <div class="wizard-acties">
+      <button class="wizard-terug" onclick="window.wizardTerug(2)">← Terug</button>
+      <button
+        id="wizard-next-btn"
+        class="wizard-volgende ${data.selectedPositions.length === 0 ? 'disabled' : ''}"
+        ${data.selectedPositions.length === 0 ? 'disabled' : ''}
+        onclick="window.wizardVolgende(2)">
+        Technieken kiezen →
+      </button>
+    </div>
+  `;
+}
+
+function renderWizardStap3(data) {
+  let groepen = '';
+  let aantalGroepen = 0;
+
+  data.selectedPositions.forEach(posId => {
+    const posInfo = WIZARD_POSITIES.find(p => p.id === posId);
+    if (posId === 'worpen') {
+      Object.entries(throwsData).forEach(([cat, worpen]) => {
+        groepen += renderTechniekGroep(cat, worpen.map(w => w.name), data.selectedTechnieken);
+        aantalGroepen++;
+      });
+    } else {
+      const namen = getTechniekVoorPositie(posId);
+      if (namen && namen.length > 0) {
+        groepen += renderTechniekGroep(posInfo.label, namen, data.selectedTechnieken);
+        aantalGroepen++;
+      }
+    }
+  });
+
+  return `
+    <h2 class="wizard-titel">Welke technieken geoefend?</h2>
+    ${aantalGroepen === 0
+      ? `<p class="wizard-hint">Geen technieken beschikbaar voor de geselecteerde posities.</p>`
+      : groepen
+    }
+    <div class="wizard-acties">
+      <button class="wizard-terug" onclick="window.wizardTerug(3)">← Terug</button>
+      <button class="wizard-volgende" onclick="window.wizardVolgende(3)">Sparring feedback →</button>
+    </div>
+  `;
+}
+
+function renderWizardStap4(data) {
+  const tags = data.sparring?.tags || [];
+  return `
+    <h2 class="wizard-titel">Hoe was het sparren?</h2>
+    <div class="mood-knoppen">
+      ${SPARRING_MOODS.map(m => `
+        <button
+          class="mood-knop ${data.sparring?.mood === m.id ? 'geselecteerd' : ''}"
+          data-mood="${m.id}"
+          onclick="window.wizardSetMood('${m.id}')">
+          <span class="mood-icon">${m.icon}</span>
+          <span class="mood-label">${m.label}</span>
+        </button>
+      `).join('')}
+    </div>
+    <div class="tag-knoppen">
+      ${SPARRING_TAGS.map(t => `
+        <button
+          class="tag-knop ${tags.includes(t.id) ? 'geselecteerd' : ''}"
+          data-tag="${t.id}"
+          onclick="window.wizardToggleTag('${t.id}')">
+          ${t.label}
+        </button>
+      `).join('')}
+    </div>
+    <div class="form-veld" style="margin-top:1rem;">
+      <label for="w-note">Notitie <span class="wizard-optioneel">(optioneel)</span></label>
+      <textarea
+        id="w-note"
+        class="log-textarea"
+        placeholder="Wat wil je onthouden van deze training?"
+        rows="3"
+      >${data.note || ''}</textarea>
+    </div>
+    <div class="wizard-acties">
+      <button class="wizard-terug" onclick="window.wizardTerug(4)">← Terug</button>
+      <button class="wizard-opslaan" onclick="window.wizardOpslaan()">💾 Opslaan</button>
+    </div>
+  `;
+}
+
+function renderWizardStap5(data) {
+  const mood = SPARRING_MOODS.find(m => m.id === data.sparring?.mood);
+  const metaItems = [
+    formatDatum(data.datum),
+    data.gym      || null,
+    data.duration ? data.duration + ' min' : null
+  ].filter(Boolean);
+
+  return `
+    <div class="wizard-bevestiging">
+      <div class="bevestiging-check">✅</div>
+      <h2 class="wizard-titel">Training opgeslagen!</h2>
+      <p class="bevestiging-meta">${metaItems.join(' · ')}</p>
+      ${data.selectedTechnieken.length > 0 ? `<p class="bevestiging-sub">${data.selectedTechnieken.length} techniek(en) gelogd</p>` : ''}
+      ${mood ? `<p class="bevestiging-sub">${mood.icon} ${mood.label}</p>` : ''}
+      <div class="wizard-acties wizard-acties-center" style="margin-top:1.5rem;">
+        <button class="wizard-terug" onclick="window.resetWizard()">➕ Nieuwe training</button>
+        <button class="wizard-volgende" onclick="window.switchLogTab('overzicht')">📋 Bekijk overzicht</button>
+      </div>
+    </div>
+  `;
+}
+
+// ─── Overzicht ────────────────────────────────────────────────────────────────
 
 function renderOverzicht() {
   const sessies = loadSessionsSortedByDate();
 
   if (sessies.length === 0) {
-    return `<div class="logboek-leeg"><p>Nog geen sessies gelogd.</p><p>Ga naar <strong>Nieuw loggen</strong> om je eerste les bij te houden.</p></div>`;
+    return `<div class="logboek-leeg"><p>Nog geen sessies gelogd.</p><p>Ga naar <strong>⚡ Loggen</strong> om je eerste les bij te houden.</p></div>`;
   }
 
   let html = `<h2 class="logboek-titel">Alle trainingen</h2><div class="sessies-grid">`;
 
   sessies.forEach(sessie => {
+    const moodIcon = sessie.sparring?.mood
+      ? ({ good: '😊', average: '😐', bad: '😤' })[sessie.sparring.mood] || ''
+      : '';
+    const tags = sessie.sparring?.tags || [];
+
     html += `
       <div class="sessie-kaart">
         <div class="sessie-kaart-header">
           <span class="sessie-datum">${formatDatum(sessie.datum)}</span>
-          <span class="sessie-techniek-count">${sessie.technieken.length} techniek(en)</span>
+          ${sessie.gym      ? `<span class="sessie-meta-chip">${sessie.gym}</span>` : ''}
+          ${sessie.duration ? `<span class="sessie-meta-chip">${sessie.duration} min</span>` : ''}
+          ${moodIcon        ? `<span class="sessie-meta-chip">${moodIcon}</span>` : ''}
+          <span class="sessie-techniek-count">${sessie.technieken.length} tech.</span>
           <button class="btn-verwijder-sessie" onclick="window.verwijderSessie('${sessie.id}')" aria-label="Verwijder sessie">🗑️</button>
         </div>
+        ${sessie.note ? `<p class="sessie-note">${escapeHTML(sessie.note)}</p>` : ''}
+        ${tags.length > 0 ? `
+          <div class="sessie-tags">
+            ${tags.map(tag => {
+              const t = SPARRING_TAGS.find(st => st.id === tag);
+              return t ? `<span class="sessie-tag">${t.label}</span>` : '';
+            }).join('')}
+          </div>
+        ` : ''}
         <ul class="sessie-techniek-lijst">
           ${sessie.technieken.map(t => `
             <li class="sessie-techniek-entry">
@@ -390,13 +604,14 @@ function renderOverzicht() {
   return html;
 }
 
-function renderStats() {
-  const stats      = getStats();
-  const voortgang  = loadAllProgress();
-  const alleTechnieken = getAllTechnieken();
+// ─── Stats ────────────────────────────────────────────────────────────────────
 
-  const metVoortgang = alleTechnieken.filter(n => voortgang[n]);
-  const totaal = alleTechnieken.length;
+function renderStats() {
+  const stats         = getStats();
+  const voortgang     = loadAllProgress();
+  const alleTechnieken = getAllTechnieken();
+  const metVoortgang  = alleTechnieken.filter(n => voortgang[n]);
+  const totaal        = alleTechnieken.length;
 
   let html = `
     <h2 class="logboek-titel">Voortgang & Statistieken</h2>
@@ -449,12 +664,12 @@ function renderStats() {
 // ─── Window globals ───────────────────────────────────────────────────────────
 
 window.switchTab = function(tab) {
-  setState({ currentTab: tab, selectedPosition: null, logTab: 'nieuw' });
+  setState({ currentTab: tab, selectedPosition: null, logTab: 'nieuw', logStep: 1, wizardData: null });
   renderApp();
 };
 
 window.switchLogTab = function(logTab) {
-  setState({ logTab });
+  setState({ logTab, logStep: 1, wizardData: null });
   renderApp();
 };
 
@@ -489,61 +704,98 @@ window.setProgress = function(naam, niveau, btn) {
   });
 };
 
-window.filterCategorie = function(cat) {
-  document.querySelectorAll('.categorie-filter-btn').forEach(b => {
-    b.classList.toggle('actief', b.dataset.cat === cat);
-  });
-  const search = (document.getElementById('techniek-zoek')?.value || '').toLowerCase();
-  document.querySelectorAll('.techniek-log-item').forEach(item => {
-    const matchCat    = cat === 'Alles' || item.dataset.categorie === cat;
-    const matchSearch = !search || item.dataset.naam.includes(search);
-    item.style.display = (matchCat && matchSearch) ? '' : 'none';
-  });
-};
-
-window.filterTechnieken = function(query) {
-  const activeCatBtn = document.querySelector('.categorie-filter-btn.actief');
-  const cat   = activeCatBtn?.dataset.cat || 'Alles';
-  const search = query.toLowerCase();
-  document.querySelectorAll('.techniek-log-item').forEach(item => {
-    const matchCat    = cat === 'Alles' || item.dataset.categorie === cat;
-    const matchSearch = !search || item.dataset.naam.includes(search);
-    item.style.display = (matchCat && matchSearch) ? '' : 'none';
-  });
-};
-
-window.slaSessionOp = function() {
-  const datum = document.getElementById('sessie-datum')?.value;
-  const alleTechnieken = getAllTechniekMetCategorie();
-  const technieken = [];
-
-  alleTechnieken.forEach((t, i) => {
-    const aantekening = document.getElementById(`sessie-note-${i}`)?.value?.trim() || '';
-    const niveau      = document.getElementById(`niveau-${i}`)?.value || '';
-    if (aantekening || niveau) {
-      technieken.push({ naam: t.naam, aantekening, niveau });
-    }
-  });
-
-  const feedback = document.getElementById('sessie-feedback');
-
-  if (technieken.length === 0) {
-    feedback.textContent = '⚠️ Voeg minstens één techniek toe met aantekening of niveau.';
-    feedback.className = 'sessie-feedback fout';
-    return;
-  }
-
-  saveSession(datum, technieken);
-  feedback.textContent = `✅ Sessie opgeslagen met ${technieken.length} techniek(en)!`;
-  feedback.className = 'sessie-feedback succes';
-  setTimeout(() => { setState({ logTab: 'overzicht' }); renderApp(); }, 1200);
-};
-
 window.verwijderSessie = function(id) {
   if (confirm('Deze sessie verwijderen?')) {
     deleteSession(id);
     renderApp();
   }
+};
+
+// ── Wizard globals ────────────────────────────────────────────────────────────
+
+window.wizardVolgende = function(currentStep) {
+  const data = collectWizardStapData(currentStep);
+  setState({ logStep: currentStep + 1, wizardData: data });
+  renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.wizardTerug = function(currentStep) {
+  const data = collectWizardStapData(currentStep);
+  setState({ logStep: currentStep - 1, wizardData: data });
+  renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.wizardTogglePositie = function(id) {
+  const s = getState();
+  const data = s.wizardData || initWizardData();
+  const positions = data.selectedPositions.includes(id)
+    ? data.selectedPositions.filter(p => p !== id)
+    : [...data.selectedPositions, id];
+  setState({ wizardData: { ...data, selectedPositions: positions } });
+
+  document.querySelector(`.positie-knop[data-pos="${id}"]`)
+    ?.classList.toggle('geselecteerd', positions.includes(id));
+
+  const nextBtn = document.getElementById('wizard-next-btn');
+  if (nextBtn) {
+    nextBtn.disabled = positions.length === 0;
+    nextBtn.classList.toggle('disabled', positions.length === 0);
+  }
+};
+
+window.wizardToggleTechniek = function(naam, checked) {
+  const s = getState();
+  const data = s.wizardData || initWizardData();
+  const technieken = checked
+    ? [...data.selectedTechnieken, naam]
+    : data.selectedTechnieken.filter(t => t !== naam);
+  setState({ wizardData: { ...data, selectedTechnieken: technieken } });
+
+  document.querySelector(`input[data-naam="${naam}"]`)
+    ?.closest('label')?.classList.toggle('geselecteerd', checked);
+};
+
+window.wizardSetMood = function(mood) {
+  const s = getState();
+  const data = s.wizardData || initWizardData();
+  setState({ wizardData: { ...data, sparring: { ...(data.sparring || {}), mood } } });
+
+  document.querySelectorAll('.mood-knop').forEach(b => {
+    b.classList.toggle('geselecteerd', b.dataset.mood === mood);
+  });
+};
+
+window.wizardToggleTag = function(tagId) {
+  const s = getState();
+  const data = s.wizardData || initWizardData();
+  const tags = data.sparring?.tags || [];
+  const newTags = tags.includes(tagId) ? tags.filter(t => t !== tagId) : [...tags, tagId];
+  setState({ wizardData: { ...data, sparring: { ...(data.sparring || {}), tags: newTags } } });
+
+  document.querySelector(`.tag-knop[data-tag="${tagId}"]`)
+    ?.classList.toggle('geselecteerd', newTags.includes(tagId));
+};
+
+window.wizardOpslaan = function() {
+  const data = collectWizardStapData(4);
+  const technieken = data.selectedTechnieken.map(naam => ({ naam, aantekening: '', niveau: '' }));
+  const extra = {
+    gym:      data.gym,
+    duration: data.duration,
+    note:     data.note,
+    sparring: data.sparring
+  };
+  saveSession(data.datum, technieken, extra);
+  setState({ logStep: 5, wizardData: data });
+  renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.resetWizard = function() {
+  setState({ logStep: 1, wizardData: null });
+  renderApp();
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

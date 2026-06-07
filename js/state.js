@@ -4,6 +4,8 @@ let state = {
   currentTab: "ground",
   selectedPosition: null,
   logTab: "nieuw",
+  logStep: 1,
+  wizardData: null,
   theme: localStorage.getItem("theme") || "light"
 };
 
