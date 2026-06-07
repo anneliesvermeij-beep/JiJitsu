@@ -205,36 +205,47 @@ function renderGroundTab(state) {
 // ─── Throws tab ──────────────────────────────────────────────────────────────
 
 function renderThrowsTab() {
-  let html = `<h2 class="section-heading">Worpen</h2><div class="throws-grid">`;
+  let html = `<h2 class="section-heading">Worpen</h2><div class="positions-grid">`;
 
   Object.keys(throwsData).forEach(category => {
-    html += `<div class="throw-category">`;
-    html += `<div class="throw-category-header">${category}</div>`;
     throwsData[category].forEach(t => {
       const progress = getProgress(t.name);
+      const videoId  = getYouTubeId(t.link);
       html += `
-        <div class="throw-item">
-          <div class="throw-item-header">
-            <h4 class="throw-naam">${t.name}</h4>
-            ${progress ? `<span class="niveau-badge niveau-${progress}">${NIVEAU_ICONS[progress]} ${NIVEAU_LABELS[progress]}</span>` : ''}
-          </div>
-          <div class="throw-beschrijving">${t.description}</div>
-          <div class="throw-kuzushi"><strong>Kuzushi:</strong> ${t.kuzushi}</div>
-          <a href="${t.link}" target="_blank" class="youtube-link">▶ Video</a>
-          <div class="niveau-knoppen" style="margin-top:10px;">
-            ${NIVEAUS.map(n => `
-              <button
-                class="niveau-btn ${progress === n ? 'actief niveau-' + n : ''}"
-                onclick="window.setProgress('${t.name}', '${n}', this)"
-                title="${NIVEAU_LABELS[n]}">
-                ${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}
-              </button>
-            `).join('')}
+        <div class="worp-kaart">
+          ${videoId ? `
+            <a href="${t.link}" target="_blank" class="sub-thumbnail-link">
+              <img
+                class="pos-photo"
+                src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg"
+                alt="${t.name}"
+                loading="lazy"
+                onerror="this.style.display='none'"
+              >
+            </a>
+          ` : ''}
+          <div class="pos-card-body">
+            <div class="worp-naam-rij">
+              <h3 class="pos-name">${t.name}</h3>
+              ${progress ? `<span class="niveau-badge niveau-${progress}">${NIVEAU_ICONS[progress]} ${NIVEAU_LABELS[progress]}</span>` : ''}
+            </div>
+            <div class="pos-japanese">${category}</div>
+            <div class="throw-beschrijving">${t.description}</div>
+            <div class="throw-kuzushi"><strong>Kuzushi:</strong> ${t.kuzushi}</div>
+            <div class="niveau-knoppen" style="margin-top:10px;">
+              ${NIVEAUS.map(n => `
+                <button
+                  class="niveau-btn ${progress === n ? 'actief niveau-' + n : ''}"
+                  onclick="window.setProgress('${t.name}', '${n}', this)"
+                  title="${NIVEAU_LABELS[n]}">
+                  ${NIVEAU_ICONS[n]} ${NIVEAU_LABELS[n]}
+                </button>
+              `).join('')}
+            </div>
           </div>
         </div>
       `;
     });
-    html += `</div>`;
   });
 
   html += `</div>`;
